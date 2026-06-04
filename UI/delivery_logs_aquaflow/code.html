@@ -1,0 +1,387 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AquaFlow - Deliveries Log</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#4cd7f6",
+                        "surface-container-highest": "#d3e4fe",
+                        "primary-fixed": "#d8e2ff",
+                        "on-tertiary-fixed": "#001f26",
+                        "on-background": "#0b1c30",
+                        "on-primary-container": "#fefcff",
+                        "surface-dim": "#cbdbf5",
+                        "on-primary": "#ffffff",
+                        "tertiary": "#006577",
+                        "secondary-container": "#d2e4fb",
+                        "tertiary-fixed": "#acedff",
+                        "surface-tint": "#005ac4",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#004396",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#dce9ff",
+                        "secondary-fixed": "#d2e4fb",
+                        "outline": "#727786",
+                        "on-tertiary-container": "#f9fdff",
+                        "primary": "#0058bf",
+                        "tertiary-container": "#008096",
+                        "on-tertiary-fixed-variant": "#004e5c",
+                        "on-surface-variant": "#414755",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#c1c6d7",
+                        "surface": "#f8f9ff",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#213145",
+                        "on-primary-fixed": "#001a42",
+                        "surface-container-low": "#eff4ff",
+                        "primary-fixed-dim": "#aec6ff",
+                        "primary-container": "#006fef",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#0b1d2d",
+                        "surface-container": "#e5eeff",
+                        "on-secondary-container": "#556679",
+                        "inverse-primary": "#aec6ff",
+                        "secondary-fixed-dim": "#b7c8de",
+                        "surface-variant": "#d3e4fe",
+                        "background": "#f8f9ff",
+                        "on-surface": "#0b1c30",
+                        "on-secondary-fixed-variant": "#38485a",
+                        "secondary": "#4f6073",
+                        "surface-bright": "#f8f9ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "touch-target": "48px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "data-tabular": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "data-tabular": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill-icon {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md h-screen flex overflow-hidden">
+<!-- SideNavBar (Web Only) -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface dark:bg-inverse-surface py-6 shadow-md z-40">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined fill-icon" data-icon="water_drop">water_drop</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">AquaFlow</h1>
+<p class="font-label-md text-label-md text-secondary">Regional Hub</p>
+</div>
+</div>
+<div class="flex-1 px-4 space-y-2 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-variant rounded-lg mx-2 duration-200 ease-in-out transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Overview</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-variant rounded-lg mx-2 duration-200 ease-in-out transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span class="font-label-md text-label-md">Route Map</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-variant rounded-lg mx-2 duration-200 ease-in-out transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="local_shipping">local_shipping</span>
+<span class="font-label-md text-label-md">Fleet Status</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-lg mx-2 duration-200 ease-in-out transition-all" href="#">
+<span class="material-symbols-outlined fill-icon" data-icon="inventory_2">inventory_2</span>
+<span class="font-label-md text-label-md">Stock Manager</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-variant rounded-lg mx-2 duration-200 ease-in-out transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-label-md text-label-md">Invoices</span>
+</a>
+</div>
+<div class="px-6 mt-auto">
+<button class="w-full bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md py-3 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                Add New Delivery
+            </button>
+<div class="mt-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-variant rounded-lg duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-2 text-secondary hover:bg-surface-variant rounded-lg duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 flex flex-col h-screen overflow-hidden bg-surface-container-lowest">
+<!-- TopNavBar (Web) -->
+<header class="hidden md:flex justify-between items-center w-full px-margin-desktop h-touch-target bg-surface-container-lowest dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm z-30 shrink-0">
+<div class="flex gap-6">
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary-container transition-colors cursor-pointer active:opacity-80 font-body-md text-body-md" href="#">Dashboard</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary-container transition-colors cursor-pointer active:opacity-80 font-body-md text-body-md" href="#">Analytics</a>
+<a class="text-primary font-bold border-b-2 border-primary pb-1 hover:text-primary-container transition-colors cursor-pointer active:opacity-80 font-body-md text-body-md" href="#">Orders</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary-container transition-colors cursor-pointer active:opacity-80 font-body-md text-body-md" href="#">Inventory</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary-container transition-colors cursor-pointer active:opacity-80 font-body-md text-body-md" href="#">Customers</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-sm" data-icon="search">search</span>
+<input class="pl-9 pr-4 py-1.5 bg-surface rounded-full border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-sm w-64 transition-all" placeholder="Search orders..." type="text">
+</div>
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden border border-outline-variant ml-2">
+<img alt="Admin profile" class="w-full h-full object-cover" data-alt="A professional headshot of a mature male administrator with short hair and a neat beard, wearing a crisp blue dress shirt. The lighting is soft and corporate, creating a trustworthy and competent impression. The background is a subtle, out-of-focus light gray office setting, emphasizing the clean, modern aesthetic of a water supply logistics dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAD2X1Ozn4-0c_KQgJxi51vZXZ-c9lBFXdpfXsBZIlU0HSJtEGybiQImG68qHCYdio9aKZuYV9jdDiSc_ciGMG9CmYVKOQbL-r5AwPDT2ZLccUcQJFEw1Wseefc9QZIalLo2UPIInGIjz6C6FYj3mOOh8BG0T0tD_jWEZMGbLosIV03_JUXpnUV4h7yGuSdr9BiPII0Ms6seIKARm0NPBqW0EjWyxkHfFKf6SxNOicEvJs5SWTEnFQC_JfzWtkC_XkBk5v3L0jya_g">
+</div>
+</div>
+</header>
+<!-- Page Header & Filters -->
+<div class="px-margin-mobile md:px-margin-desktop py-6 shrink-0 bg-surface-container-lowest z-20">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+<div>
+<h2 class="font-headline-xl text-headline-xl text-on-background hidden md:block">Deliveries Log</h2>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background md:hidden">Deliveries Log</h2>
+<p class="font-body-md text-body-md text-secondary mt-1">Manage and track all water bottle shipments.</p>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<!-- Date Range Picker -->
+<div class="flex items-center bg-surface border border-outline-variant rounded-lg px-3 py-2 hover:border-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-secondary mr-2" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-md text-label-md text-on-surface">Oct 12 - Oct 19, 2023</span>
+<span class="material-symbols-outlined text-secondary ml-2" data-icon="arrow_drop_down">arrow_drop_down</span>
+</div>
+<!-- Export Button -->
+<button class="flex items-center gap-2 bg-surface text-primary border border-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+                        Export
+                    </button>
+</div>
+</div>
+<!-- Status Tabs -->
+<div class="flex overflow-x-auto pb-2 -mx-margin-mobile px-margin-mobile md:mx-0 md:px-0 hide-scrollbar gap-2">
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-primary-container text-on-primary-container font-label-md text-label-md border border-transparent">
+                    All Deliveries <span class="ml-1 opacity-70">(124)</span>
+</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-surface text-secondary border border-outline-variant hover:border-primary hover:text-primary transition-colors font-label-md text-label-md">
+                    Pending <span class="ml-1 opacity-70">(12)</span>
+</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-surface text-secondary border border-outline-variant hover:border-primary hover:text-primary transition-colors font-label-md text-label-md">
+                    Delivered <span class="ml-1 opacity-70">(105)</span>
+</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-surface text-secondary border border-outline-variant hover:border-primary hover:text-primary transition-colors font-label-md text-label-md">
+                    Missed <span class="ml-1 opacity-70">(5)</span>
+</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-surface text-secondary border border-outline-variant hover:border-primary hover:text-primary transition-colors font-label-md text-label-md">
+                    Cancelled <span class="ml-1 opacity-70">(2)</span>
+</button>
+</div>
+</div>
+<!-- Data Table Container -->
+<div class="flex-1 overflow-auto px-margin-mobile md:px-margin-desktop pb-24 md:pb-8 bg-surface-container-lowest">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col h-full">
+<!-- Table Header (Sticky) -->
+<div class="grid grid-cols-12 gap-4 px-6 py-3 bg-surface-container-low border-b border-outline-variant sticky top-0 z-10 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">
+<div class="col-span-4 md:col-span-2 flex items-center gap-1 cursor-pointer hover:text-primary">Date <span class="material-symbols-outlined text-[16px]" data-icon="arrow_downward">arrow_downward</span></div>
+<div class="col-span-5 md:col-span-3">Customer</div>
+<div class="col-span-3 md:col-span-2 hidden md:block">Rider</div>
+<div class="col-span-3 md:col-span-2 text-right">Bottle Count</div>
+<div class="col-span-3 md:col-span-1 text-right hidden md:block">Amount</div>
+<div class="col-span-3 md:col-span-2 text-center">Status</div>
+</div>
+<!-- Table Body -->
+<div class="overflow-y-auto flex-1 font-data-tabular text-data-tabular text-on-surface">
+<!-- Row 1 -->
+<div class="grid grid-cols-12 gap-4 px-6 py-4 border-b border-outline-variant hover:bg-inverse-on-surface transition-colors items-center group">
+<div class="col-span-4 md:col-span-2 flex flex-col">
+<span class="font-medium text-on-background">Oct 19, 2023</span>
+<span class="text-xs text-secondary">08:45 AM</span>
+</div>
+<div class="col-span-5 md:col-span-3 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed-dim flex items-center justify-center text-primary font-bold text-xs shrink-0">CS</div>
+<div class="flex flex-col truncate">
+<span class="font-medium truncate">Corporate Solutions Inc.</span>
+<span class="text-xs text-secondary truncate">120 Tech Blvd, Suite 400</span>
+</div>
+</div>
+<div class="col-span-3 md:col-span-2 hidden md:flex items-center gap-2">
+<img alt="Rider" class="w-6 h-6 rounded-full object-cover" data-alt="A small, circular headshot of a male delivery rider wearing a blue cap. He has a friendly expression. The background is a bright, generic outdoor setting. This is used as an avatar in a data table to represent the assigned driver." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjwzWnO1P0VtepIY_Ld7OBA80YJuyEXNVqUjXJR6nW1sIkZDBBKNCLQRE-d4rJgObAjXjYFpnAXQcCMuOFqEyAO5Yy-1UqArzwjYjlNOo9DEYZ21l4_i8BWRwvl3cEfgGraW5Q7OKXZNV-5ZZ0CljHCEkg5HuHX8unnOdL_Rh0GXURp-3p3Gy9FiFpKoTRbHWqDq-YmrKXxZ1RuX5mWBGo2w-wo20w150NeFejaAXC49S-7VwzY8GfOqac_vw_XPn7ggl6KLT1i1Q">
+<span class="truncate">Michael T.</span>
+</div>
+<div class="col-span-3 md:col-span-2 text-right font-medium">
+                            24 <span class="text-secondary font-normal text-xs ml-1">x 5 Gal</span>
+</div>
+<div class="col-span-3 md:col-span-1 text-right hidden md:block">
+                            $144.00
+                        </div>
+<div class="col-span-3 md:col-span-2 flex justify-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary-fixed text-primary">
+                                Delivered
+                            </span>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-12 gap-4 px-6 py-4 border-b border-outline-variant bg-surface hover:bg-inverse-on-surface transition-colors items-center group">
+<div class="col-span-4 md:col-span-2 flex flex-col">
+<span class="font-medium text-on-background">Oct 19, 2023</span>
+<span class="text-xs text-secondary">10:15 AM</span>
+</div>
+<div class="col-span-5 md:col-span-3 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-xs shrink-0">OM</div>
+<div class="flex flex-col truncate">
+<span class="font-medium truncate">Oakwood Medical Center</span>
+<span class="text-xs text-secondary truncate">450 Health Way</span>
+</div>
+</div>
+<div class="col-span-3 md:col-span-2 hidden md:flex items-center gap-2">
+<img alt="Rider" class="w-6 h-6 rounded-full object-cover" data-alt="A small, circular headshot of a female delivery rider with a bright smile, wearing a blue uniform shirt. The lighting is sunny and optimistic. This is used as an avatar in a data table to represent the assigned driver." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVVadkpW9pUB5FFhhxHK3SW4FxpMgNU8JIX61aj9hVQC4025C7-NFat15KrRsHL6gxx4YPAx6JTuKVM8nr_Dri8rxbPqcrGLVmjhM03w0g37I9AtXaHacZUV230ilVzE3p-mVD4n5VkkfTF7LGE50WjmuwIlms5S040_rD4ZFCmVXZi0LKxaBKW2BRmJawtPLMWl2Z689DepC6EnLFixzQfsr-NN5YZq6jRYSJgBOMAg4I10XLU1LGErHrhFVI03z7TLk4-wwMQZk">
+<span class="truncate">Sarah J.</span>
+</div>
+<div class="col-span-3 md:col-span-2 text-right font-medium">
+                            10 <span class="text-secondary font-normal text-xs ml-1">x 5 Gal</span>
+</div>
+<div class="col-span-3 md:col-span-1 text-right hidden md:block">
+                            $60.00
+                        </div>
+<div class="col-span-3 md:col-span-2 flex justify-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface-dim text-secondary border border-outline-variant">
+                                Pending
+                            </span>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="grid grid-cols-12 gap-4 px-6 py-4 border-b border-outline-variant hover:bg-inverse-on-surface transition-colors items-center group">
+<div class="col-span-4 md:col-span-2 flex flex-col">
+<span class="font-medium text-on-background">Oct 19, 2023</span>
+<span class="text-xs text-error font-semibold">11:30 AM (Late)</span>
+</div>
+<div class="col-span-5 md:col-span-3 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed-dim flex items-center justify-center text-on-tertiary-fixed font-bold text-xs shrink-0">FG</div>
+<div class="flex flex-col truncate">
+<span class="font-medium truncate">Fresh Greens Market</span>
+<span class="text-xs text-secondary truncate">88 Valley Road</span>
+</div>
+</div>
+<div class="col-span-3 md:col-span-2 hidden md:flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-surface-variant flex items-center justify-center text-secondary text-xs shrink-0">
+<span class="material-symbols-outlined text-[14px]" data-icon="person">person</span>
+</div>
+<span class="truncate text-secondary italic">Unassigned</span>
+</div>
+<div class="col-span-3 md:col-span-2 text-right font-medium">
+                            5 <span class="text-secondary font-normal text-xs ml-1">x 5 Gal</span>
+</div>
+<div class="col-span-3 md:col-span-1 text-right hidden md:block">
+                            $30.00
+                        </div>
+<div class="col-span-3 md:col-span-2 flex justify-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-error-container text-on-error-container">
+                                Missed
+                            </span>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="grid grid-cols-12 gap-4 px-6 py-4 border-b border-outline-variant bg-surface hover:bg-inverse-on-surface transition-colors items-center group opacity-70">
+<div class="col-span-4 md:col-span-2 flex flex-col">
+<span class="font-medium text-on-background line-through">Oct 18, 2023</span>
+<span class="text-xs text-secondary">02:00 PM</span>
+</div>
+<div class="col-span-5 md:col-span-3 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-secondary font-bold text-xs shrink-0">RD</div>
+<div class="flex flex-col truncate">
+<span class="font-medium truncate text-secondary">Riverdale Apartments</span>
+<span class="text-xs text-secondary truncate">Bldg 4, Leasing Office</span>
+</div>
+</div>
+<div class="col-span-3 md:col-span-2 hidden md:flex items-center gap-2">
+<img alt="Rider" class="w-6 h-6 rounded-full object-cover grayscale" data-alt="A small, circular headshot of a male delivery rider wearing a blue cap. He has a friendly expression. The image is rendered in grayscale to indicate a cancelled or inactive status. This is used as an avatar in a data table." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBm-g7fXIPTdyVwnBU_nDUbuB6ajndQq6A0rmuunO32nAcaREVlfR_8__SwhHGZ3Qq_qN8INzhoTVVrNbVe8JF62AfnsR63l0wzCAAnLp55ftqEKvRRSZOQy2-uY1300wZQL-0dFk71Nkk64yB9rTeiIi2HL-97Zz2JP9z9TJ6b8oXJGG561y4W-xo1zVE2kTHJgTldWTd85GcKGHmPfsQzTQg7jcepFobAfqSvGi3OpWHkd3jvGOsfEj9PV3v41rJ8kEIwv3Y5mRU">
+<span class="truncate text-secondary">Michael T.</span>
+</div>
+<div class="col-span-3 md:col-span-2 text-right font-medium text-secondary">
+                            12 <span class="text-secondary font-normal text-xs ml-1">x 5 Gal</span>
+</div>
+<div class="col-span-3 md:col-span-1 text-right hidden md:block text-secondary">
+                            $72.00
+                        </div>
+<div class="col-span-3 md:col-span-2 flex justify-center">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-surface text-secondary border border-outline border-dashed">
+                                Cancelled
+                            </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface dark:bg-on-background shadow-lg border-t border-outline-variant rounded-t-xl">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-2xl px-6 py-1 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined fill-icon mb-1" data-icon="route">route</span>
+<span class="font-label-md-mobile text-label-md-mobile">Routes</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:bg-surface-variant scale-95 active:scale-90 transition-transform rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="qr_code_scanner">qr_code_scanner</span>
+<span class="font-label-md-mobile text-label-md-mobile">Scan</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:bg-surface-variant scale-95 active:scale-90 transition-transform rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="history">history</span>
+<span class="font-label-md-mobile text-label-md-mobile">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 active:bg-surface-variant scale-95 active:scale-90 transition-transform rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="account_circle">account_circle</span>
+<span class="font-label-md-mobile text-label-md-mobile">Profile</span>
+</a>
+</nav>
+<!-- Mobile FAB (Floating Action Button) for quick Add Delivery -->
+<button class="md:hidden fixed bottom-24 right-4 w-14 h-14 bg-primary text-on-primary rounded-2xl shadow-lg flex items-center justify-center z-40 hover:bg-primary-container active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</body></html>

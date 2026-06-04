@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AquaFlow Supplier Portal - Generate Invoice</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#0b1d2d",
+                        "inverse-primary": "#aec6ff",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed-dim": "#aec6ff",
+                        "on-primary-container": "#fefcff",
+                        "tertiary-container": "#008096",
+                        "surface": "#f8f9ff",
+                        "secondary-fixed-dim": "#b7c8de",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#4cd7f6",
+                        "surface-container-high": "#dce9ff",
+                        "surface-bright": "#f8f9ff",
+                        "surface-variant": "#d3e4fe",
+                        "surface-container": "#e5eeff",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#f9fdff",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "background": "#f8f9ff",
+                        "surface-tint": "#005ac4",
+                        "on-background": "#0b1c30",
+                        "secondary": "#4f6073",
+                        "primary-container": "#006fef",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#0b1c30",
+                        "tertiary": "#006577",
+                        "on-surface-variant": "#414755",
+                        "on-secondary-fixed-variant": "#38485a",
+                        "primary-fixed": "#d8e2ff",
+                        "secondary-container": "#d2e4fb",
+                        "primary": "#0058bf",
+                        "on-tertiary-fixed-variant": "#004e5c",
+                        "on-secondary-container": "#556679",
+                        "outline-variant": "#c1c6d7",
+                        "on-tertiary-fixed": "#001f26",
+                        "surface-container-low": "#eff4ff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#001a42",
+                        "surface-container-highest": "#d3e4fe",
+                        "inverse-surface": "#213145",
+                        "tertiary-fixed": "#acedff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "outline": "#727786",
+                        "surface-dim": "#cbdbf5",
+                        "on-primary-fixed-variant": "#004396",
+                        "secondary-fixed": "#d2e4fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "touch-target": "48px",
+                        "unit": "4px",
+                        "margin-desktop": "40px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "headline-xl": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "data-tabular": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "data-tabular": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased relative min-h-screen overflow-hidden">
+<!-- Mock Background Content (Blurred/Dimmed) -->
+<div class="absolute inset-0 z-0 bg-surface-container-low opacity-40 blur-sm pointer-events-none flex flex-col">
+<!-- Top App Bar Mock -->
+<header class="h-16 border-b border-outline-variant bg-surface px-margin-desktop flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 bg-primary rounded-full"></div>
+<div class="h-6 w-32 bg-outline-variant rounded"></div>
+</div>
+<div class="flex gap-4">
+<div class="h-6 w-16 bg-outline-variant rounded"></div>
+<div class="h-6 w-16 bg-outline-variant rounded"></div>
+</div>
+</header>
+<!-- Content Mock -->
+<main class="flex-1 p-margin-desktop grid grid-cols-12 gap-gutter">
+<div class="col-span-3 bg-surface border border-outline-variant rounded-lg p-6 h-64"></div>
+<div class="col-span-9 bg-surface border border-outline-variant rounded-lg p-6 h-96"></div>
+</main>
+</div>
+<!-- Overlay -->
+<div class="fixed inset-0 z-40 bg-on-background/30 backdrop-blur-sm transition-opacity"></div>
+<!-- Modal Container -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+<!-- Modal Card (Level 2 Elevation) -->
+<div class="bg-surface-container-lowest w-full max-w-3xl rounded-xl shadow-[0_12px_24px_rgba(11,28,48,0.1)] border border-outline-variant flex flex-col max-h-[921px] overflow-hidden animate-[fadeInUp_0.3s_ease-out]">
+<!-- Header -->
+<div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant">
+<h2 class="font-headline-md text-headline-md text-on-surface">Generate New Invoice</h2>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-highest">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<!-- Body (Scrollable) -->
+<div class="flex-1 overflow-y-auto p-6 space-y-6">
+<!-- Customer Selection -->
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Customer</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors">
+<option selected="" value="oasis">Oasis Fitness Center (ID: CUST-8492)</option>
+<option value="techcorp">TechCorp Offices (ID: CUST-8493)</option>
+<option value="metro">Metro Hospital (ID: CUST-8494)</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Billing Period -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Start Date</label>
+<div class="relative">
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors" type="date" value="2023-10-01"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">End Date</label>
+<div class="relative">
+<input class="w-full bg-surface border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors" type="date" value="2023-10-31"/>
+</div>
+</div>
+</div>
+<!-- Invoice Details (Table) -->
+<div class="space-y-3">
+<label class="font-label-md text-label-md text-on-surface-variant block uppercase tracking-wider">Invoice Details</label>
+<div class="border border-outline-variant rounded-lg overflow-hidden">
+<table class="w-full text-left">
+<thead class="bg-surface-container text-on-surface font-label-md text-label-md border-b border-outline-variant">
+<tr>
+<th class="px-4 py-3 font-semibold">Item Description</th>
+<th class="px-4 py-3 font-semibold text-right">Qty</th>
+<th class="px-4 py-3 font-semibold text-right">Unit Price</th>
+<th class="px-4 py-3 font-semibold text-right">Total</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant font-data-tabular text-data-tabular text-on-surface bg-surface-container-lowest">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-4 py-4">
+<div class="font-medium text-on-surface">Water Bottles (20L)</div>
+<div class="text-on-surface-variant text-sm font-body-md">Premium Purified</div>
+</td>
+<td class="px-4 py-4 text-right">45</td>
+<td class="px-4 py-4 text-right">$6.50</td>
+<td class="px-4 py-4 text-right font-medium">$292.50</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors bg-surface-bright">
+<td class="px-4 py-4">
+<div class="font-medium text-on-surface">Service Fee</div>
+<div class="text-on-surface-variant text-sm font-body-md">Monthly Equipment Maintenance</div>
+</td>
+<td class="px-4 py-4 text-right">1</td>
+<td class="px-4 py-4 text-right">$45.00</td>
+<td class="px-4 py-4 text-right font-medium">$45.00</td>
+</tr>
+</tbody>
+</table>
+<div class="bg-surface-container-low p-2 flex justify-center border-t border-outline-variant">
+<button class="text-primary hover:text-primary-fixed-variant font-label-md text-label-md flex items-center gap-1 py-1 px-3 rounded hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span> Add Line Item
+                            </button>
+</div>
+</div>
+</div>
+<!-- Toggles & Summary Area -->
+<div class="flex flex-col md:flex-row justify-between items-end gap-6 pt-4">
+<!-- Toggles -->
+<div class="space-y-4 w-full md:w-auto">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+<span class="font-body-md text-body-md text-on-surface select-none group-hover:text-primary transition-colors">Send via Email automatically</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="relative">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</div>
+<span class="font-body-md text-body-md text-on-surface select-none group-hover:text-primary transition-colors">Mark as Paid (Direct Debit)</span>
+</label>
+</div>
+<!-- Summary -->
+<div class="w-full md:w-64 space-y-2 border border-outline-variant rounded-lg p-4 bg-surface">
+<div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+<span>Subtotal</span>
+<span>$337.50</span>
+</div>
+<div class="flex justify-between font-body-md text-body-md text-on-surface-variant">
+<span>Tax (10%)</span>
+<span>$33.75</span>
+</div>
+<div class="h-px bg-outline-variant my-2"></div>
+<div class="flex justify-between font-headline-md text-headline-md text-on-surface font-bold">
+<span>Total</span>
+<span class="text-primary">$371.25</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="bg-surface-container-low px-6 py-4 border-t border-outline-variant flex justify-end gap-3 rounded-b-xl">
+<button class="px-6 py-2 rounded-lg border border-primary text-primary font-label-md text-label-md hover:bg-surface-container-highest transition-colors focus:ring-2 focus:ring-primary focus:outline-none">
+                    Cancel
+                </button>
+<button class="px-6 py-2 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-on-primary-fixed-variant transition-colors shadow-sm focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="send">send</span>
+                    Generate &amp; Send Invoice
+                </button>
+</div>
+</div>
+</div>
+<style>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
+</body></html>
