@@ -4,6 +4,7 @@ import { api } from "../../api/client";
 import { StatCard } from "../../components/StatCard";
 import { ConfirmationModal } from "../../components/ConfirmationModal";
 import { AdminInvoices } from "./AdminInvoices";
+import { AdminSubscriptions } from "./AdminSubscriptions";
 
 // Water drop SVG icon
 function DropIcon({ size = 20, color = "#1d4ed8" }) {
@@ -361,13 +362,17 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
     return <AdminInvoices invoices={invoices} suppliers={suppliers} loadInvoices={loadInvoices} />;
   }
 
+  if (activeTab === "subscriptions") {
+    return <AdminSubscriptions />;
+  }
+
   if (activeTab === "overview") {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-fadeIn">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/40 p-6 rounded-3xl border border-white/60 backdrop-blur-md">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-              <DropIcon size={24} color="#1d4ed8" /> Super Admin Overview
+            <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
+              <DropIcon size={24} color="#3b82f6" /> Super Admin Overview
             </h1>
             <p className="text-sm text-gray-500 mt-1">Platform wide statistics and revenue tracking.</p>
           </div>
@@ -380,13 +385,13 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          <div className="bg-blue-600 rounded-3xl p-6 text-white shadow-lg shadow-blue-200 flex flex-col justify-between">
+          <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl p-6 text-white shadow-xl shadow-blue-500/10 flex flex-col justify-between hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
             <div>
-              <p className="text-blue-100 text-sm font-semibold mb-1 uppercase tracking-wider">Total Revenue</p>
-              <h3 className="text-4xl font-bold">${totalRevenue.toLocaleString()}</h3>
+              <p className="text-blue-100 text-xs font-bold mb-2 uppercase tracking-wider">Total Revenue</p>
+              <h3 className="text-4xl font-black">${totalRevenue.toLocaleString()}</h3>
             </div>
-            <div className="mt-4 flex items-center gap-2 text-sm text-blue-100 font-medium">
-              <span><CreditCard className="w-4 h-4 inline-block" /> Paid Invoices</span>
+            <div className="mt-6 flex items-center gap-2 text-sm text-blue-100 font-semibold bg-white/10 py-1.5 px-3 rounded-xl w-fit">
+              <CreditCard className="w-4 h-4" /> <span>Paid Invoices</span>
             </div>
           </div>
           <StatCard label="Total Suppliers" value={loading ? "…" : suppliers.length} icon={<Building2 className="w-6 h-6 text-blue-600" />} sub={`${activeCount} Active Tenants`} />
@@ -401,16 +406,16 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 animate-fadeIn">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/40 p-6 rounded-3xl border border-white/60 backdrop-blur-md">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <DropIcon size={24} color="#1d4ed8" /> Water Supplier Management
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
+            <DropIcon size={24} color="#3b82f6" /> Water Supplier Management
           </h1>
           <p className="text-sm text-gray-500 mt-1">Configure global suppliers and monitor their tenants.</p>
         </div>
         <button
           onClick={() => { setShowModal(true); setFormError(""); }}
-          className="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl shadow-lg shadow-blue-200 hover:shadow-blue-300 transition-all flex items-center justify-center gap-2 text-sm self-start md:self-auto hover:scale-[1.02]"
+          className="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-2xl shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 transition-all flex items-center justify-center gap-2 text-sm self-start md:self-auto hover:scale-[1.02] active:scale-[0.98]"
         >
           <Plus className="w-4 h-4" /> Add New Water Supplier
         </button>
@@ -423,7 +428,7 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
       )}
 
       {/* Main Suppliers Workspace */}
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/50 overflow-hidden">
+      <div className="bg-white rounded-3xl border border-gray-100 shadow-md shadow-gray-100/30 overflow-hidden">
         <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-gray-50/50 to-white">
           <div>
             <h2 className="font-bold text-gray-800">Water Supplying Companies</h2>
@@ -470,9 +475,17 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-2xl space-y-1 w-[200px]">
-                        <p className="text-xs font-bold text-gray-600"><Key className="w-3 h-3 inline-block" /> Username: <span className="font-mono text-blue-600 select-all">{s.userId?.username || "—"}</span></p>
-                        <p className="text-xs font-bold text-gray-600"><Lock className="w-3 h-3 inline-block" /> Password: <span className="font-mono text-gray-700 select-all bg-white px-1 py-0.5 rounded border border-gray-200">{s.userId?.passwordText || "—"}</span></p>
+                      <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-2xl space-y-1.5 w-[200px]">
+                        <p className="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
+                          <Key className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                          <span>User:</span> 
+                          <span className="font-mono text-blue-600 font-bold select-all truncate ml-auto">{s.userId?.username || "—"}</span>
+                        </p>
+                        <p className="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
+                          <Lock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                          <span>Pass:</span> 
+                          <span className="font-mono text-gray-700 bg-white px-1.5 py-0.5 rounded border border-gray-100 font-bold select-all ml-auto">{s.userId?.passwordText || "—"}</span>
+                        </p>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -498,8 +511,8 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
                     </td>
                     <td className="px-6 py-4">
                       <div>
-                        <p className="text-xs font-semibold text-gray-700"><Bike className="w-3 h-3 inline-block text-gray-600" /> Riders: {s.totalRiders || 0}</p>
-                        <p className="text-xs font-semibold text-gray-700 mt-0.5"><Home className="w-3 h-3 inline-block" /> Customers: {s.totalCustomers || 0}</p>
+                        <p className="text-xs font-semibold text-gray-700 flex items-center gap-1"><Bike className="w-3.5 h-3.5 text-gray-400" /> Riders: {s.totalRiders || 0}</p>
+                        <p className="text-xs font-semibold text-gray-700 mt-1 flex items-center gap-1"><Home className="w-3.5 h-3.5 text-gray-400" /> Customers: {s.totalCustomers || 0}</p>
                       </div>
                     </td>
                     <td className="px-6 py-4">

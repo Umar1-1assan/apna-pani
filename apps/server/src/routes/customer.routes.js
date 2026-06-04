@@ -5,7 +5,10 @@ const {
   getCustomerProfile,
   updateCustomerProfile,
   getCustomerOrders,
-  getCustomerInvoices
+  getCustomerInvoices,
+  pauseSubscription,
+  cancelSubscription,
+  payDues
 } = require('../controllers/customer.controller');
 
 // Require customer role for all routes in this file
@@ -16,5 +19,9 @@ router.put('/me', updateCustomerProfile);
 
 router.get('/orders', getCustomerOrders);
 router.get('/invoices', getCustomerInvoices);
+
+router.put('/pause', pauseSubscription);
+router.put('/cancel', cancelSubscription);
+router.put('/pay-dues', payDues);
 
 module.exports = router;

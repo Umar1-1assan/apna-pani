@@ -1,7 +1,9 @@
-import { User, X, Key, Truck, Trash2 } from 'lucide-react';
+import { User, X, Key, Truck, Trash2, RefreshCw } from 'lucide-react';
 import React, { useState } from 'react';
+import { ConfirmationModal } from '../../ConfirmationModal';
 
 export function UpdateCustomerModal({ customer, onClose, onUpdate, onDelete, riders, submitting, formError }) {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [form, setForm] = useState({
     username: customer.userId?.username || "",
     password: "", // Only sent if changed
@@ -10,7 +12,12 @@ export function UpdateCustomerModal({ customer, onClose, onUpdate, onDelete, rid
     phone: customer.userId?.phone || customer.phoneNumber || "",
     address: customer.address || "",
     notes: customer.notes || "",
-    monthlyBottles: customer.monthlyBottles || "4",
+    bottlesPerDelivery: customer.bottlesPerDelivery || "4",
+    deliveryFrequency: customer.deliveryFrequency || "1",
+    bottlePrice: customer.bottlePrice || "150",
+    deliveryCharges: customer.deliveryCharges || "0",
+    preferredDeliveryTime: customer.preferredDeliveryTime || "any",
+    billingCycle: customer.billingCycle || "monthly",
     deliveryBoyId: customer.deliveryBoyId || ""
   });
 
@@ -99,8 +106,23 @@ export function UpdateCustomerModal({ customer, onClose, onUpdate, onDelete, rid
                   <input name="address" value={form.address} onChange={handleChange} required className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm" type="text" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-gray-600">Daily Water Count (Bottles)</label>
-                  <input name="monthlyBottles" value={form.monthlyBottles} onChange={handleChange} min="1" type="number" required className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm" />
+                  <label className="text-xs font-semibold text-gray-600">Delivery Volume (Bottles)</label>
+                  <input name="bottlesPerDelivery" value={form.bottlesPerDelivery} onChange={handleChange} min="1" type="number" required className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-600">Delivery Frequency</label>
+                  <div className="relative">
+                    <select name="deliveryFrequency" value={form.deliveryFrequency} onChange={handleChange} className="w-full pl-4 pr-10 py-2.5 appearance-none rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm bg-white">
+                      <option value="1">Daily</option>
+                      <option value="2">Every 2 Days</option>
+                      <option value="3">Every 3 Days</option>
+                      <option value="4">Every 4 Days</option>
+                      <option value="5">Every 5 Days</option>
+                      <option value="6">Every 6 Days</option>
+                      <option value="7">Weekly</option>
+                    </select>
+                    <svg className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-gray-600">Assigned Rider</label>
@@ -114,9 +136,49 @@ export function UpdateCustomerModal({ customer, onClose, onUpdate, onDelete, rid
                     <svg className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                   </div>
                 </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-600">Preferred Delivery Time</label>
+                  <div className="relative">
+                    <select name="preferredDeliveryTime" value={form.preferredDeliveryTime} onChange={handleChange} className="w-full pl-4 pr-10 py-2.5 appearance-none rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm bg-white">
+                      <option value="any">Any Time</option>
+                      <option value="morning">Morning (8 AM - 12 PM)</option>
+                      <option value="afternoon">Afternoon (12 PM - 4 PM)</option>
+                      <option value="evening">Evening (4 PM - 8 PM)</option>
+                    </select>
+                    <svg className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </div>
+                </div>
                 <div className="flex flex-col gap-1.5 md:col-span-2">
                   <label className="text-xs font-semibold text-gray-600">Delivery Notes</label>
                   <textarea name="notes" value={form.notes} onChange={handleChange} className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm resize-none" rows="2"></textarea>
+                </div>
+              </div>
+            </section>
+
+            {/* Section 4: Billing Preferences */}
+            <section>
+              <h3 className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <RefreshCw className="w-4 h-4" /> Billing Preferences
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-600">Price per Bottle (₨)</label>
+                  <input name="bottlePrice" value={form.bottlePrice} onChange={handleChange} required min="1" type="number" className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-600">Delivery Charges (₨)</label>
+                  <input name="deliveryCharges" value={form.deliveryCharges} onChange={handleChange} required min="0" type="number" className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-600">Billing Cycle</label>
+                  <div className="relative">
+                    <select name="billingCycle" value={form.billingCycle} onChange={handleChange} className="w-full pl-4 pr-10 py-2.5 appearance-none rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm bg-white">
+                      <option value="weekly">Weekly</option>
+                      <option value="fortnightly">Fortnightly (15 Days)</option>
+                      <option value="monthly">Monthly</option>
+                    </select>
+                    <svg className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </div>
                 </div>
               </div>
             </section>
@@ -126,7 +188,7 @@ export function UpdateCustomerModal({ customer, onClose, onUpdate, onDelete, rid
 
         {/* Footer */}
         <div className="p-6 border-t border-gray-100 flex justify-between items-center shrink-0 bg-gray-50 rounded-b-xl">
-          <button onClick={() => { if(window.confirm('Delete customer?')) onDelete(customer._id); }} type="button" className="px-4 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors text-sm font-semibold flex items-center gap-2">
+          <button onClick={() => setShowDeleteConfirm(true)} type="button" className="px-4 py-2 rounded-lg text-red-600 hover:bg-red-50 transition-colors text-sm font-semibold flex items-center gap-2">
             <Trash2 className="w-4 h-4" /> Delete Customer
           </button>
           
@@ -140,6 +202,19 @@ export function UpdateCustomerModal({ customer, onClose, onUpdate, onDelete, rid
           </div>
         </div>
       </div>
+
+      <ConfirmationModal 
+        isOpen={showDeleteConfirm} 
+        onClose={() => setShowDeleteConfirm(false)} 
+        onConfirm={() => {
+          onDelete(customer._id);
+          setShowDeleteConfirm(false);
+        }} 
+        title="Delete Customer" 
+        message={`Are you sure you want to delete ${customer.userId?.fullName}? This action cannot be undone.`}
+        type="danger"
+        confirmText="Delete Customer"
+      />
     </div>
   );
 }

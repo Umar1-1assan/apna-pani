@@ -6,6 +6,8 @@ export function InvoicesManagement({ customers, invoices = [], onGenerateInvoice
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
+  const [filterStartDate, setFilterStartDate] = useState('');
+  const [filterEndDate, setFilterEndDate] = useState('');
 
   const formattedInvoices = invoices.map(inv => ({
     id: inv._id,
@@ -20,6 +22,27 @@ export function InvoicesManagement({ customers, invoices = [], onGenerateInvoice
   if (filter === "paid") filteredInvoices = filteredInvoices.filter(i => i.status === "Paid");
   if (filter === "unpaid") filteredInvoices = filteredInvoices.filter(i => i.status === "Unpaid");
 
+  if (filterStartDate || filterEndDate) {
+    filteredInvoices = filteredInvoices.filter(inv => {
+      // Find original invoice to get proper dates
+      const originalInv = invoices.find(i => i._id === inv.id);
+      if (!originalInv) return true;
+      
+      const invDate = new Date(originalInv.periodStart || originalInv.createdAt);
+      let match = true;
+      
+      if (filterStartDate) {
+        match = match && invDate >= new Date(filterStartDate);
+      }
+      if (filterEndDate) {
+        const endDate = new Date(filterEndDate);
+        endDate.setHours(23, 59, 59, 999);
+        match = match && invDate <= endDate;
+      }
+      return match;
+    });
+  }
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 animate-fadeIn">
       {/* Header Area */}
@@ -29,39 +52,63 @@ export function InvoicesManagement({ customers, invoices = [], onGenerateInvoice
           <p className="text-sm text-gray-500 mt-1">{t('invoices_sub')}</p>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          <div className="relative w-full sm:w-64">
-            <input 
-              type="text" 
-              placeholder={t('search_customers')} 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
-            />
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto mt-4 sm:mt-0">
+            {/* Date Range Picker */}
+            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2 hover:border-gray-300 transition-colors focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/10 shadow-sm shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <input 
+                type="date" 
+                value={filterStartDate}
+                onChange={e => setFilterStartDate(e.target.value)}
+                onKeyDown={(e) => e.preventDefault()}
+                onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                className="text-sm font-medium text-gray-700 outline-none bg-transparent cursor-pointer w-[118px] text-center"
+                title="Start Date"
+              />
+              <span className="text-gray-400 font-medium">→</span>
+              <input 
+                type="date" 
+                value={filterEndDate}
+                onChange={e => setFilterEndDate(e.target.value)}
+                onKeyDown={(e) => e.preventDefault()}
+                onClick={(e) => e.target.showPicker && e.target.showPicker()}
+                className="text-sm font-medium text-gray-700 outline-none bg-transparent cursor-pointer w-[118px] text-center"
+                title="End Date"
+              />
+            </div>
+
+            <div className="relative w-full sm:w-64 shrink-0">
+              <input 
+                type="text" 
+                placeholder={t('search_customers')} 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm"
+              />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            </div>
+            
+            <div className="flex bg-gray-100 rounded-xl p-1 border border-gray-200 shadow-inner shrink-0">
+              <button 
+                onClick={() => setFilter("all")}
+                className={`px-5 py-1.5 text-xs font-bold rounded-lg transition-all ${filter === "all" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+              >
+                {t('all')}
+              </button>
+              <button 
+                onClick={() => setFilter("paid")}
+                className={`px-5 py-1.5 text-xs font-bold rounded-lg transition-all ${filter === "paid" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+              >
+                {t('paid')}
+              </button>
+              <button 
+                onClick={() => setFilter("unpaid")}
+                className={`px-5 py-1.5 text-xs font-bold rounded-lg transition-all ${filter === "unpaid" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+              >
+                {t('unpaid')}
+              </button>
+            </div>
           </div>
-          
-          <div className="flex bg-white rounded-xl p-1 border border-gray-200 shadow-sm shrink-0">
-            <button 
-              onClick={() => setFilter("all")}
-              className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${filter === "all" ? "bg-gray-100 text-gray-800 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-            >
-              {t('all')}
-            </button>
-            <button 
-              onClick={() => setFilter("paid")}
-              className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${filter === "paid" ? "bg-gray-100 text-gray-800 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-            >
-              {t('paid')}
-            </button>
-            <button 
-              onClick={() => setFilter("unpaid")}
-              className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${filter === "unpaid" ? "bg-gray-100 text-gray-800 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-            >
-              {t('unpaid')}
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Data Table */}

@@ -8,7 +8,8 @@ const {
   assignRider,
   updateOrderStatus,
   getRiderEodSummary,
-  confirmOrderReceipt
+  confirmOrderReceipt,
+  cancelOrder
 } = require('../controllers/order.controller');
 
 // Create Order (Customer or Supplier can create)
@@ -34,5 +35,8 @@ router.put('/:id/status', asyncHandler(updateOrderStatus));
 
 // Confirm Order Receipt (Customer)
 router.put('/:id/confirm', requireRole('customer'), asyncHandler(confirmOrderReceipt));
+
+// Cancel Order (Customer)
+router.put('/:id/cancel', asyncHandler(cancelOrder));
 
 module.exports = router;

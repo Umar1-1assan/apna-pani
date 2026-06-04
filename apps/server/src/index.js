@@ -13,6 +13,7 @@ const {
   injectTenantScope,
   scopeByTenant
 } = require('./middleware/auth.middleware');
+const { initCronJobs } = require('./jobs/cronJobs');
 
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
@@ -22,6 +23,7 @@ const healthRoutes = require('./routes/health.routes');
 const orderRoutes = require('./routes/order.routes');
 const invoiceRoutes = require('./routes/invoice.routes');
 const customerRoutes = require('./routes/customer.routes');
+const subscriptionRoutes = require('./routes/subscription.routes');
 
 const app = express();
 
@@ -126,6 +128,12 @@ app.use('/api/orders',
   orderRoutes
 );
 
+// Subscription routes (contain both supplier and admin endpoints)
+app.use('/api',
+  authenticate,
+  subscriptionRoutes
+);
+
 /**
  * 404 Handler
  */
@@ -151,6 +159,9 @@ const io = new Server(server, {
 
 // Set io instance to app
 app.set('io', io);
+
+// Initialize Background Jobs
+initCronJobs(io);
 
 io.on('connection', (socket) => {
   console.log(`Socket connected: ${socket.id}`);

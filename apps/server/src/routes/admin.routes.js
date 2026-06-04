@@ -164,7 +164,7 @@ router.put('/invoices/:id/status',
   requireRole('super_admin'),
   asyncHandler(async (req, res) => {
     const { status } = req.body;
-    if (!['unpaid', 'paid', 'overdue'].includes(status)) {
+    if (!['unpaid', 'pending_verification', 'paid', 'overdue'].includes(status)) {
       return res.status(400).json({ success: false, message: 'Invalid status' });
     }
     

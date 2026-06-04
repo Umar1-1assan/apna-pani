@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Search, Plus, MapPin, Phone, ArrowLeftRight, User, AlertTriangle } from 'lucide-react';
+import { Search, Plus, MapPin, Phone, ArrowLeftRight, User, AlertTriangle, Edit2, Trash2, Users, ArrowUpRight } from 'lucide-react';
+import { ConfirmationModal } from '../ConfirmationModal';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-export function RiderManagement({ riders, onAddRider }) {
+export function RiderManagement({ riders, customers, onAddRider, onUpdateRider, onDeleteRider, onViewCustomers }) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
+  const [deleteRiderId, setDeleteRiderId] = useState(null);
 
   const filteredRiders = riders.filter(r => 
     r.userId?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -14,27 +16,27 @@ export function RiderManagement({ riders, onAddRider }) {
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 animate-fadeIn">
       {/* Header Area */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{t('rider_management')}</h1>
-          <p className="text-sm text-gray-500 mt-1">{t('rider_management_sub')}</p>
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight">{t('rider_management')}</h1>
+          <p className="text-sm text-gray-500 mt-1 font-medium">{t('rider_management_sub')}</p>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <div className="relative w-full sm:w-64">
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center">
+          <div className="relative w-full sm:w-80 group">
             <input 
               type="text" 
               placeholder={t('search_riders')} 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
+              className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm group-hover:shadow-md"
             />
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 transition-colors group-hover:text-blue-500" />
           </div>
           
           <button 
             onClick={onAddRider}
-            className="flex items-center justify-center gap-2 px-5 py-2 bg-[#0058bf] hover:bg-[#004a9f] text-white rounded-lg text-sm font-bold shadow-md shadow-blue-200 transition-transform active:scale-95 whitespace-nowrap"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-200 transition-all hover:-translate-y-0.5 active:translate-y-0 whitespace-nowrap"
           >
             <User className="w-4 h-4" /> {t('add_delivery_boy')}
           </button>
@@ -42,26 +44,21 @@ export function RiderManagement({ riders, onAddRider }) {
       </div>
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
-          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">{t('total_fleet')}</p>
-          <div className="flex items-end gap-3">
-            <h2 className="text-4xl font-black text-gray-900">{riders.length > 0 ? riders.length : 42}</h2>
-            <span className="text-sm font-bold text-blue-600 mb-1">↗ +3 {t('this_week')}</span>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-2xl shadow-lg shadow-blue-200/50 flex flex-col justify-between text-white relative overflow-hidden group">
+          <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 group-hover:scale-110 transition-transform duration-500"></div>
+          <p className="text-xs font-bold text-blue-100 uppercase tracking-wider mb-2 relative z-10">{t('total_fleet')}</p>
+          <div className="flex items-end gap-3 relative z-10">
+            <h2 className="text-5xl font-black">{riders.length > 0 ? riders.length : 0}</h2>
+            <span className="text-sm font-bold text-blue-200 mb-1.5 flex items-center gap-1"><ArrowUpRight className="w-4 h-4"/> Active</span>
           </div>
         </div>
-        <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
-          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">{t('on_duty_today')}</p>
+
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow group">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{t('on_duty_today')}</p>
           <div className="flex items-end gap-3">
-            <h2 className="text-4xl font-black text-gray-900">{Math.max(0, riders.length - 2)}</h2>
-            <span className="text-sm font-semibold text-gray-500 mb-1">{t('active_riders_lower')}</span>
-          </div>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
-          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">{t('critical_sectors')}</p>
-          <div className="flex items-end gap-3">
-            <h2 className="text-4xl font-black text-red-600">2</h2>
-            <span className="text-sm font-semibold text-gray-500 mb-1">{t('requiring_backup')}</span>
+            <h2 className="text-5xl font-black text-gray-900">{Math.max(0, riders.length)}</h2>
+            <span className="text-sm font-semibold text-gray-500 mb-1.5">{t('active_riders_lower')}</span>
           </div>
         </div>
       </div>
@@ -83,40 +80,59 @@ export function RiderManagement({ riders, onAddRider }) {
             statusClasses = "bg-red-50 text-red-600 border-red-100";
           }
 
+          let statusStripClass = "bg-teal-500";
+          if (index % 4 === 1) statusStripClass = "bg-gray-300";
+          if (index % 4 === 2) statusStripClass = "bg-red-500";
+
           return (
-            <div key={r._id} className="bg-white rounded-xl border border-[#e2e8f0] shadow-sm hover:shadow-md transition-shadow flex flex-col">
-              <div className="p-5 flex gap-4">
-                <div className="w-14 h-14 rounded-full bg-[#eff4ff] text-[#0058bf] font-bold text-xl flex items-center justify-center shrink-0 border-2 border-white shadow-sm overflow-hidden">
+            <div key={r._id} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group overflow-hidden">
+              {/* Top colored strip based on status */}
+              <div className={`h-1.5 w-full ${statusStripClass}`}></div>
+              
+              <div className="p-6 flex gap-5">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 font-black text-2xl flex items-center justify-center shrink-0 border border-blue-100 shadow-inner group-hover:scale-105 transition-transform">
                   {/* Fallback to initials if no photo */}
                   {initials}
                 </div>
                 
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 flex flex-col justify-center">
                   <div className="flex justify-between items-start gap-2">
-                    <h3 className="text-lg font-bold text-gray-900 truncate pr-2">{r.userId?.fullName || t('unnamed_rider')}</h3>
-                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border shadow-sm shrink-0 ${statusClasses}`}>
+                    <h3 className="text-xl font-extrabold text-gray-900 truncate tracking-tight pr-2">{r.userId?.fullName || t('unnamed_rider')}</h3>
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border shadow-sm shrink-0 ${statusClasses}`}>
                       {statusLabel === t('on_duty') && <span className="w-1.5 h-1.5 rounded-full bg-white opacity-80 animate-pulse"></span>}
                       {statusLabel}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 mt-2 text-sm text-gray-500 font-semibold">
-                    <Phone className="w-3.5 h-3.5" />
-                    {r.userId?.phone || "+1 (555) 000-0000"}
+                  
+                  <div className="flex items-center gap-3 mt-3">
+                    <div className="flex items-center gap-1.5 text-sm text-gray-600 font-medium bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-100 shadow-sm">
+                      <Phone className="w-3.5 h-3.5 text-gray-400" />
+                      {r.userId?.phone || "+1 (555) 000-0000"}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm text-gray-600 font-medium bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-100 shadow-sm">
+                      <Users className="w-3.5 h-3.5 text-gray-400" />
+                      <span className="font-bold text-gray-900">{customers?.filter(c => c.deliveryBoyId === r._id).length || 0}</span>
+                    </div>
                   </div>
                 </div>
               </div>
               
-              <div className="mt-auto p-4 bg-[#f8fafc] border-t border-[#e2e8f0] rounded-b-xl flex items-center justify-between">
-                <div className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
-                  <div>
-                    <p className="text-[10px] font-bold text-gray-400 uppercase">{t('assigned_area')}</p>
-                    <p className="text-xs font-bold text-gray-800">{r.areaName || t('unassigned')}</p>
-                  </div>
+              <div className="mt-auto px-6 py-4 bg-gray-50/80 border-t border-gray-100 flex items-center justify-between opacity-90 group-hover:opacity-100 transition-opacity">
+                <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                  ID: #{r._id.substring(r._id.length - 6)}
                 </div>
-                <button className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-[#cbd5e1] text-[#0058bf] rounded-md text-[11px] font-bold hover:bg-[#f1f5f9] transition-colors shadow-sm">
-                  <ArrowLeftRight className="w-3 h-3" /> {t('change_area')}
-                </button>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => onViewCustomers(r)} className="p-2 text-gray-400 hover:text-teal-600 hover:bg-white hover:shadow-sm rounded-lg transition-all flex items-center justify-center" title="View Customers">
+                    <Users className="w-4 h-4" />
+                  </button>
+                  <button onClick={() => onUpdateRider(r)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-white hover:shadow-sm rounded-lg transition-all flex items-center justify-center" title="Edit Rider">
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                  <div className="w-px h-4 bg-gray-300 mx-1"></div>
+                  <button onClick={() => setDeleteRiderId(r._id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-white hover:shadow-sm rounded-lg transition-all flex items-center justify-center" title="Delete Rider">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           );
@@ -130,6 +146,19 @@ export function RiderManagement({ riders, onAddRider }) {
           </div>
         )}
       </div>
+
+      <ConfirmationModal 
+        isOpen={!!deleteRiderId} 
+        onClose={() => setDeleteRiderId(null)} 
+        onConfirm={() => {
+          onDeleteRider(deleteRiderId);
+          setDeleteRiderId(null);
+        }} 
+        title="Delete Rider" 
+        message="Are you sure you want to delete this rider? Any assigned customers will become unassigned."
+        type="danger"
+        confirmText="Delete Rider"
+      />
     </div>
   );
 }

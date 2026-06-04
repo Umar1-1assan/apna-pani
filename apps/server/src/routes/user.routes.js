@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const {
-  listSuppliersHandler
+  listSuppliersHandler,
+  getProfileHandler,
+  updateProfileHandler
 } = require('../controllers/user.controller');
+const { authenticate } = require('../middleware/auth.middleware');
 
 /**
  * Public User Routes
@@ -10,5 +13,11 @@ const {
 
 // GET /api/users/suppliers - Public: list active suppliers
 router.get('/suppliers', listSuppliersHandler);
+
+/**
+ * Protected User Routes
+ */
+router.get('/profile', authenticate, getProfileHandler);
+router.put('/profile', authenticate, updateProfileHandler);
 
 module.exports = router;

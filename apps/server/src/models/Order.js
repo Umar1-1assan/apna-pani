@@ -42,9 +42,18 @@ const OrderSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  deliveryType: {
+    type: String,
+    enum: ['standard', 'express'],
+    default: 'standard'
+  },
+  deliveryFee: {
+    type: Number,
+    default: 0
+  },
   status: {
     type: String,
-    enum: ['pending', 'assigned', 'in_transit', 'arrived', 'delivered', 'completed', 'failed'],
+    enum: ['pending', 'assigned', 'in_transit', 'arrived', 'delivered', 'completed', 'failed', 'cancelled'],
     default: 'pending'
   },
   statusTimeline: [{

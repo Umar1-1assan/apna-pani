@@ -1,16 +1,16 @@
 import { Bike, X, Key, User, Briefcase, Camera, RefreshCw } from 'lucide-react';
 import React, { useState } from 'react';
 
-export function AddRiderModal({ onClose, onSubmit, submitting, formError }) {
+export function UpdateRiderModal({ rider, onClose, onUpdate, submitting, formError }) {
   const [form, setForm] = useState({
-    fullName: "",
-    phone: "",
-    email: "",
-    username: "",
+    fullName: rider.userId?.fullName || "",
+    phone: rider.userId?.phone || "",
+    email: rider.userId?.email || "",
+    username: rider.userId?.username || "",
     password: "",
-    shiftTiming: "Morning (06:00 - 14:00)",
-    assignedVehicle: "",
-    licenseNumber: ""
+    shiftTiming: rider.shiftTiming || "Morning (06:00 - 14:00)",
+    assignedVehicle: rider.assignedVehicle || "",
+    licenseNumber: rider.licenseNumber || ""
   });
 
   const handleChange = (e) => {
@@ -27,7 +27,7 @@ export function AddRiderModal({ onClose, onSubmit, submitting, formError }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(form);
+    onUpdate(rider._id, form);
   };
 
   return (
@@ -41,8 +41,8 @@ export function AddRiderModal({ onClose, onSubmit, submitting, formError }) {
               <Bike className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-800">Add New Rider</h2>
-              <p className="text-sm text-gray-500 mt-0.5">Register a new delivery personnel for your fleet.</p>
+              <h2 className="text-xl font-bold text-gray-800">Update Rider</h2>
+              <p className="text-sm text-gray-500 mt-0.5">Modify details for {form.fullName}</p>
             </div>
           </div>
           <button onClick={onClose} aria-label="Close modal" className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors self-start">
@@ -58,7 +58,7 @@ export function AddRiderModal({ onClose, onSubmit, submitting, formError }) {
             </div>
           )}
 
-          <form id="addRiderForm" onSubmit={handleSubmit} className="flex flex-col gap-8">
+          <form id="updateRiderForm" onSubmit={handleSubmit} className="flex flex-col gap-8">
             
             {/* Section 1: Personal Details */}
             <section>
@@ -71,7 +71,7 @@ export function AddRiderModal({ onClose, onSubmit, submitting, formError }) {
                   <div className="w-24 h-24 rounded-full bg-gray-50 border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 hover:border-sky-500 hover:text-sky-600 transition-colors cursor-pointer">
                     <Camera className="w-8 h-8" />
                   </div>
-                  <span className="text-xs font-semibold text-sky-600 cursor-pointer hover:underline">Upload Photo</span>
+                  <span className="text-xs font-semibold text-sky-600 cursor-pointer hover:underline">Update Photo</span>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
@@ -99,20 +99,18 @@ export function AddRiderModal({ onClose, onSubmit, submitting, formError }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-sky-50/30 p-5 rounded-xl border border-sky-100">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-gray-600">Username</label>
-                  <input name="username" value={form.username} onChange={handleChange} required className="w-full px-4 py-2.5 rounded-lg border border-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm shadow-sm" placeholder="Auto-generated or custom" type="text" />
+                  <input name="username" value={form.username} disabled className="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-100 text-gray-500 cursor-not-allowed outline-none text-sm shadow-sm" type="text" />
+                  <span className="text-[11px] text-gray-500">Username cannot be changed.</span>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-gray-600">Temporary Password</label>
+                  <label className="text-xs font-semibold text-gray-600">New Password</label>
                   <div className="flex gap-2">
-                    <input name="password" value={form.password} onChange={handleChange} required className="w-full px-4 py-2.5 rounded-lg border border-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm shadow-sm flex-1" type="text" placeholder="Enter or generate..." />
+                    <input name="password" value={form.password} onChange={handleChange} className="w-full px-4 py-2.5 rounded-lg border border-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm shadow-sm flex-1" type="text" placeholder="Leave blank to keep current" />
                     <button type="button" onClick={generatePassword} className="px-4 py-2.5 rounded-lg border border-sky-200 text-sky-600 hover:bg-sky-100 bg-white transition-colors text-sm font-semibold flex items-center gap-2 shadow-sm">
                       <RefreshCw className="w-4 h-4" /> Generate
                     </button>
                   </div>
                 </div>
-                <p className="md:col-span-2 text-[11px] text-gray-500 flex items-start gap-1">
-                  <span className="text-sky-600">ℹ</span> Credentials will be shared with the rider. They will be prompted to change the password on first login.
-                </p>
               </div>
             </section>
 
@@ -153,8 +151,8 @@ export function AddRiderModal({ onClose, onSubmit, submitting, formError }) {
           <button onClick={onClose} type="button" className="px-6 py-2.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-100 hover:text-gray-800 transition-colors text-sm font-semibold">
             Cancel
           </button>
-          <button form="addRiderForm" type="submit" disabled={submitting} className="px-6 py-2.5 rounded-lg bg-sky-600 text-white hover:bg-sky-700 transition-colors text-sm font-semibold shadow-sm flex items-center gap-2">
-            <Bike className="w-4 h-4" /> {submitting ? "Creating..." : "Create Rider"}
+          <button form="updateRiderForm" type="submit" disabled={submitting} className="px-6 py-2.5 rounded-lg bg-sky-600 text-white hover:bg-sky-700 transition-colors text-sm font-semibold shadow-sm flex items-center gap-2">
+            <Bike className="w-4 h-4" /> {submitting ? "Updating..." : "Update Rider"}
           </button>
         </div>
       </div>

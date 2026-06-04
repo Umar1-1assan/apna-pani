@@ -24,10 +24,10 @@ import {
 } from 'recharts';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-export function SupplierOverview({ customers, riders, orders }) {
+export function SupplierOverview({ customers, riders, orders, supplierProfile }) {
   const { t } = useTranslation();
   // Compute Key Metrics
-  const estimatedRevenue = customers.reduce((acc, curr) => acc + ((curr.monthlyBottles || 1) * (curr.bottlePrice || 6.5)), 0);
+  const estimatedRevenue = customers.reduce((acc, curr) => acc + ((curr.bottlesPerDelivery || 1) * (curr.bottlePrice || 6.5)), 0);
   
   const pendingOrders = orders.filter(o => ['pending', 'assigned', 'in_transit'].includes(o.status));
   const completedOrders = orders.filter(o => o.status === 'delivered');
@@ -77,17 +77,34 @@ export function SupplierOverview({ customers, riders, orders }) {
           <p className="text-sm text-gray-500 mt-1">{t('business_overview_sub')}</p>
         </div>
         
-        <div className="flex bg-white rounded-xl p-1 border border-gray-200 shadow-sm shrink-0">
-          <button className="px-4 py-1.5 text-xs font-bold rounded-lg transition-all bg-[#0058bf] text-white shadow-sm">
-            {t('today')}
-          </button>
-          <button className="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500 hover:text-gray-700">
-            {t('days_7')}
-          </button>
-          <button className="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500 hover:text-gray-700">
-            {t('days_30')}
-          </button>
-        </div>
+        {/* Operating Day Badge */}
+        {supplierProfile && (
+          <div className="flex-1 max-w-sm">
+            {supplierProfile.operatingDays?.includes(new Date().getDay()) ? (
+              <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 p-3 rounded-xl shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                  <CheckCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-blue-900">Today is an Operating Day</h4>
+                  <p className="text-xs text-blue-700">Automated deliveries are scheduled to run.</p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 p-3 rounded-xl shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-gray-700">Today is an Off-Day</h4>
+                  <p className="text-xs text-gray-500">Automated deliveries will resume on your next operating day.</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+
       </div>
 
       {/* Hero Metrics Row */}

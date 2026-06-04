@@ -5,14 +5,17 @@ import { StatCard } from "../../components/StatCard";
 import { AddCustomerModal } from "../../components/supplier/modals/AddCustomerModal";
 import { AddRiderModal } from "../../components/supplier/modals/AddRiderModal";
 import { UpdateCustomerModal } from "../../components/supplier/modals/UpdateCustomerModal";
+import { UpdateRiderModal } from "../../components/supplier/modals/UpdateRiderModal";
+import { RiderCustomersModal } from "../../components/supplier/modals/RiderCustomersModal";
 import { GenerateInvoiceModal } from "../../components/supplier/modals/GenerateInvoiceModal";
 import { FilterDeliveriesModal } from "../../components/supplier/modals/FilterDeliveriesModal";
 import { CustomerManagement } from "../../components/supplier/CustomerManagement";
 import { RiderManagement } from "../../components/supplier/RiderManagement";
 import { DeliveriesLog } from "../../components/supplier/DeliveriesLog";
 import { InvoicesManagement } from "../../components/supplier/InvoicesManagement";
-import { SupplierConfiguration } from "../../components/supplier/SupplierConfiguration";
 import { SupplierOverview } from "../../components/supplier/SupplierOverview";
+import { SupplierSubscription } from "./SupplierSubscription";
+import { ProductManagement } from "../../components/supplier/ProductManagement";
 import { Bike, Plus, AlertTriangle, Users, Banknote, CheckCircle, Key, Lock, MessageCircle, X, MapPin, Package, RefreshCw, CalendarDays, Receipt, Filter } from "lucide-react";
 import { useTranslation } from "../../contexts/LanguageContext";
 
@@ -54,6 +57,10 @@ export function SupplierDashboard({ user, activeTab }) {
   
   const [showGenerateInvoiceModal, setShowGenerateInvoiceModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
+
+  const [selectedRider, setSelectedRider] = useState(null);
+  const [showUpdateRiderModal, setShowUpdateRiderModal] = useState(false);
+  const [showRiderCustomersModal, setShowRiderCustomersModal] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
@@ -107,6 +114,7 @@ export function SupplierDashboard({ user, activeTab }) {
       socket.on("orderCreated", () => loadData());
       socket.on("orderUpdated", () => loadData());
       socket.on("orderAssigned", () => loadData());
+      socket.on("customerUpdated", () => loadData());
 
       return () => {
         socket.disconnect();
@@ -123,7 +131,7 @@ export function SupplierDashboard({ user, activeTab }) {
       await api.post("/suppliers/customers", {
         ...formData,
         bottlePrice: parseFloat(formData.bottlePrice),
-        monthlyBottles: parseInt(formData.monthlyBottles) || 4,
+        bottlesPerDelivery: parseInt(formData.bottlesPerDelivery) || 4,
         whatsappPhone: formData.phone
       });
       setShowCustomerModal(false);
@@ -170,6 +178,39 @@ export function SupplierDashboard({ user, activeTab }) {
       loadData();
     } catch (err) {
       setFormError(err.response?.data?.message || "Failed to delete customer.");
+    }
+  };
+
+  const handleUpdateCustomerStatus = async (customerId, newStatus) => {
+    try {
+      await api.put(`/suppliers/customers/${customerId}`, { status: newStatus });
+      loadData();
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to update status");
+    }
+  };
+
+  const handleUpdateRider = async (riderId, updatedData) => {
+    setFormError("");
+    setSubmitting(true);
+    try {
+      await api.put(`/suppliers/riders/${riderId}`, updatedData);
+      setShowUpdateRiderModal(false);
+      loadData();
+    } catch (err) {
+      setFormError(err.response?.data?.message || "Failed to update rider.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteRider = async (riderId) => {
+    try {
+      await api.delete(`/suppliers/riders/${riderId}`);
+      setShowUpdateRiderModal(false);
+      loadData();
+    } catch (err) {
+      setFormError(err.response?.data?.message || "Failed to delete rider.");
     }
   };
 
@@ -325,7 +366,7 @@ export function SupplierDashboard({ user, activeTab }) {
 
       {!loading && (
         <>
-          {activeTab === 'overview' && <SupplierOverview customers={customers} riders={riders} orders={orders} />}
+          {activeTab === 'overview' && <SupplierOverview customers={customers} riders={riders} orders={orders} supplierProfile={supplierProfile} />}
           {activeTab === 'routing' && renderRouting()}
           
           {activeTab === 'customers' && (
@@ -335,13 +376,18 @@ export function SupplierDashboard({ user, activeTab }) {
               onAddCustomer={() => setShowCustomerModal(true)} 
               onUpdateCustomer={(c) => { setSelectedCustomer(c); setShowUpdateModal(true); }}
               onDeleteCustomer={handleDeleteCustomer}
+              onUpdateStatus={handleUpdateCustomerStatus}
             />
           )}
 
           {activeTab === 'riders' && (
             <RiderManagement 
               riders={riders}
+              customers={customers}
               onAddRider={() => setShowRiderModal(true)}
+              onUpdateRider={(r) => { setSelectedRider(r); setShowUpdateRiderModal(true); }}
+              onDeleteRider={handleDeleteRider}
+              onViewCustomers={(r) => { setSelectedRider(r); setShowRiderCustomersModal(true); }}
             />
           )}
 
@@ -349,6 +395,15 @@ export function SupplierDashboard({ user, activeTab }) {
             <DeliveriesLog 
               orders={orders}
               riders={riders}
+              supplierProfile={supplierProfile}
+              onUpdateSupplierProfile={async (data) => {
+                try {
+                  await api.put('/suppliers/me', data);
+                  loadData();
+                } catch (err) {
+                  alert(err.response?.data?.message || "Failed to update supplier profile");
+                }
+              }}
               onFilter={() => setShowFilterModal(true)}
               onAssign={async (orderId, riderId) => {
                 try {
@@ -363,7 +418,9 @@ export function SupplierDashboard({ user, activeTab }) {
 
           {activeTab === 'invoices' && <InvoicesManagement customers={customers} riders={riders} invoices={invoices} onGenerateInvoice={() => setShowGenerateInvoiceModal(true)} />}
 
-          {activeTab === 'config' && <SupplierConfiguration profileData={supplierProfile} onSave={loadData} />}
+          {activeTab === 'products' && <ProductManagement />}
+
+          {activeTab === 'subscription' && <SupplierSubscription user={user} />}
         </>
       )}
 
@@ -395,6 +452,24 @@ export function SupplierDashboard({ user, activeTab }) {
           riders={riders}
           submitting={submitting}
           formError={formError}
+        />
+      )}
+
+      {showUpdateRiderModal && selectedRider && (
+        <UpdateRiderModal 
+          rider={selectedRider}
+          onClose={() => setShowUpdateRiderModal(false)}
+          onUpdate={handleUpdateRider}
+          submitting={submitting}
+          formError={formError}
+        />
+      )}
+
+      {showRiderCustomersModal && selectedRider && (
+        <RiderCustomersModal 
+          rider={selectedRider}
+          customers={customers}
+          onClose={() => setShowRiderCustomersModal(false)}
         />
       )}
 

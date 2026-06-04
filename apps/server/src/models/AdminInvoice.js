@@ -25,8 +25,11 @@ const AdminInvoiceSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['unpaid', 'paid', 'overdue'],
+    enum: ['unpaid', 'pending_verification', 'paid', 'overdue'],
     default: 'unpaid'
+  },
+  paymentNotes: {
+    type: String
   }
 }, { timestamps: true });
 

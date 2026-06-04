@@ -9,6 +9,7 @@ export function RiderDashboard({ user, activeTab }) {
   const [loading, setLoading] = useState(true);
   const [deliveries, setDeliveries] = useState([]);
   const [eodSummary, setEodSummary] = useState(null);
+  const [riderProfile, setRiderProfile] = useState(null);
   const [error, setError] = useState("");
   const [updating, setUpdating] = useState(null);
 
@@ -27,12 +28,14 @@ export function RiderDashboard({ user, activeTab }) {
   async function load() {
     try {
       setLoading(true);
-      const [ordersRes, eodRes] = await Promise.all([
+      const [ordersRes, eodRes, profileRes] = await Promise.all([
         api.get('/orders/rider'),
-        api.get('/orders/rider/eod-summary')
+        api.get('/orders/rider/eod-summary'),
+        api.get('/users/profile')
       ]);
       setDeliveries(ordersRes.data.data || []);
       setEodSummary(eodRes.data.data);
+      setRiderProfile(profileRes.data.roleProfile);
     } catch (err) {
       setError("Could not connect to backend to fetch rider data.");
     } finally {
@@ -98,6 +101,33 @@ export function RiderDashboard({ user, activeTab }) {
 
       {activeTab === 'overview' && (
         <>
+          {/* Supplier Operating Day Status */}
+          {riderProfile?.supplierId && (
+            <div className="mb-8">
+              {riderProfile.supplierId.operatingDays?.includes(new Date().getDay()) ? (
+                <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 p-4 rounded-2xl shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                    <CheckCircle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-blue-900">Today is an Operating Day</h4>
+                    <p className="text-xs text-blue-700">Deliveries are running as scheduled.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 p-4 rounded-2xl shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center shrink-0">
+                    <AlertTriangle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-gray-700">Today is an Off-Day</h4>
+                    <p className="text-xs text-gray-500">The supplier is closed today. Automated deliveries will not run.</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Quick EOD Summary Stats */}
           <div className="grid grid-cols-3 gap-3 mb-8">
             <StatCard 

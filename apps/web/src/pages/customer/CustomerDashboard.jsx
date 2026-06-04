@@ -110,101 +110,168 @@ export function CustomerDashboard({ activeTab }) {
     return <div className="p-12 text-center text-blue-600 font-medium animate-pulse">Loading Your Data...</div>;
   }
 
-  const { customer, rider } = profileData || {};
+  const { customer, rider, dashboardStats } = profileData || {};
 
   // -- TAB VIEWS --
 
   const renderOverview = () => (
-    <div className="space-y-6 animate-fadeIn max-w-5xl mx-auto">
+    <div className="space-y-4 animate-fadeIn max-w-5xl mx-auto">
       {/* Hero Welcome */}
-      <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black text-gray-900 tracking-tight">{t("welcome", { name: customer?.userId?.fullName?.split(' ')[0] || 'Customer' })}!</h2>
-          <p className="text-gray-500 mt-2 font-medium flex items-center gap-1.5">
+          <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">{t("welcome", { name: customer?.userId?.fullName?.split(' ')[0] || 'Customer' })}!</h2>
+          <p className="text-gray-500 mt-1 text-sm font-medium flex items-center gap-1.5">
             <MapPin className="w-4 h-4 text-blue-500" /> {customer?.address || t("no_address_set")}
           </p>
         </div>
-        <div className="text-center md:text-right">
-          <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">{t("account_status")}</p>
-          <div className="inline-flex items-center gap-2 mt-1 bg-green-50 text-green-700 px-4 py-1.5 rounded-full font-bold">
-            <CheckCircle className="w-4 h-4" /> {t("status_active")}
-          </div>
+        <div className="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-full font-bold text-xs shadow-sm">
+          <CheckCircle className="w-3.5 h-3.5" /> {t("status_active")}
         </div>
       </div>
 
+      {/* Delivery Status Banner */}
+      {dashboardStats && (
+        <div className="mb-4">
+          {dashboardStats.deliveryToday ? (
+            <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 p-4 sm:p-5 rounded-2xl shadow-md text-white">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0 border border-white/30">
+                  <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-base sm:text-lg font-black leading-tight">Delivery Today!</h4>
+                  <p className="text-blue-100 text-xs sm:text-sm font-medium mt-0.5">{dashboardStats.deliveryTodayDetails?.quantity || customer?.bottlesPerDelivery} bottles arriving.</p>
+                </div>
+              </div>
+              <div className="bg-white text-blue-600 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-center shadow-sm shrink-0">
+                <div className="text-[10px] text-gray-500 uppercase font-bold">Status</div>
+                <div className="text-xs sm:text-sm font-black uppercase">{dashboardStats.deliveryTodayDetails?.status || 'Scheduled'}</div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 p-4 rounded-2xl shadow-sm">
+              <div className="w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center shrink-0">
+                <CalendarDays className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm sm:text-base font-bold text-gray-800 leading-tight">No delivery today</h4>
+                <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Next projected delivery: <span className="font-bold text-gray-700">{dashboardStats.nextDeliveryDate ? new Date(dashboardStats.nextDeliveryDate).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) : 'Unknown'}</span></p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Quick Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0">
-            <Droplets className="w-7 h-7" />
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+        {/* Usage Progress */}
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-center col-span-2 md:col-span-1">
+          <div className="flex items-center justify-between mb-2 sm:mb-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-50 text-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+                <Droplets className="w-4 h-4 sm:w-5 sm:h-5" />
+              </div>
+              <p className="text-xs sm:text-sm text-gray-500 font-bold uppercase tracking-wider">Usage</p>
+            </div>
+            <span className="text-xl sm:text-2xl font-black text-blue-600">{dashboardStats?.bottlesReceivedThisCycle || 0}</span>
           </div>
-          <div>
-            <p className="text-sm text-gray-500 font-bold uppercase tracking-wider">{t("monthly_quota")}</p>
-            <p className="text-2xl font-black text-gray-900">{customer?.monthlyBottles || 0} <span className="text-sm font-bold text-gray-400">{t("bottles")}</span></p>
+          <div className="w-full bg-gray-100 rounded-full h-1.5 sm:h-2 mb-1.5 sm:mb-2 overflow-hidden">
+            <div className="bg-blue-600 h-full rounded-full" style={{ width: `${Math.min(100, ((dashboardStats?.bottlesReceivedThisCycle || 0) / Math.max(1, (customer?.bottlesPerDelivery * 4) || 20)) * 100)}%` }}></div>
           </div>
+          <p className="text-[10px] sm:text-xs text-gray-400 font-medium">Resets on {dashboardStats?.nextInvoiceDate ? new Date(dashboardStats.nextInvoiceDate).toLocaleDateString() : 'Next Cycle'}</p>
         </div>
         
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center shrink-0">
-            <CreditCard className="w-7 h-7" />
+        {/* Billing Info */}
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-center">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 text-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+              <Receipt className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
+            <p className="text-xs sm:text-sm text-gray-500 font-bold uppercase tracking-wider">Billing</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-500 font-bold uppercase tracking-wider">{t("special_price")}</p>
-            <p className="text-2xl font-black text-gray-900">₨ {customer?.bottlePrice || 0} <span className="text-sm font-bold text-gray-400">/ea</span></p>
-          </div>
+          <p className="text-base sm:text-xl font-black text-gray-900 capitalize leading-tight">{dashboardStats?.billingCycle || 'Monthly'}</p>
+          <p className="text-[10px] sm:text-xs text-gray-500 font-medium mt-1">Next: <span className="font-bold text-indigo-600">{dashboardStats?.nextInvoiceDate ? new Date(dashboardStats.nextInvoiceDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Pending'}</span></p>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex items-center gap-4">
-          <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center shrink-0">
-            <Package className="w-7 h-7" />
+        {/* Pricing Info */}
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-center">
+          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-50 text-emerald-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+              <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
+            </div>
+            <p className="text-xs sm:text-sm text-gray-500 font-bold uppercase tracking-wider">Price</p>
           </div>
-          <div>
-            <p className="text-sm text-gray-500 font-bold uppercase tracking-wider">{t("total_orders")}</p>
-            <p className="text-2xl font-black text-gray-900">{orders.length}</p>
-          </div>
+          <p className="text-lg sm:text-2xl font-black text-gray-900 leading-tight">₨ {customer?.bottlePrice || 0} <span className="text-xs sm:text-sm font-bold text-gray-400">/ea</span></p>
         </div>
       </div>
 
       {/* Assigned Team */}
-      <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
-        <h3 className="font-bold text-gray-800 text-lg mb-6 flex items-center gap-2">
-          <User className="text-blue-500" /> {t("assigned_team")}
+      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+        <h3 className="font-bold text-gray-800 text-sm sm:text-base mb-3 flex items-center gap-2">
+          <User className="text-blue-500 w-4 h-4 sm:w-5 sm:h-5" /> {t("assigned_team")}
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="p-5 bg-gray-50 border border-gray-100 rounded-2xl flex items-center gap-4">
-             <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center font-bold text-blue-600 text-xl">S</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+          <div className="p-3 sm:p-4 bg-gray-50 border border-gray-100 rounded-xl flex items-center gap-3">
+             <div className="w-10 h-10 bg-white rounded-full shadow-sm flex items-center justify-center font-bold text-blue-600">S</div>
              <div>
-               <p className="text-xs text-gray-500 font-bold uppercase tracking-wider mb-0.5">{t("water_supplier")}</p>
-               <p className="font-bold text-gray-900 text-lg">{customer?.supplierId?.businessName || 'AquaFlow Hub'}</p>
-               <p className="text-sm text-gray-500">{customer?.supplierId?.supportPhone || 'N/A'}</p>
+               <p className="text-[10px] sm:text-xs text-gray-500 font-bold uppercase tracking-wider mb-0.5">{t("water_supplier")}</p>
+               <p className="font-bold text-gray-900 text-sm sm:text-base">{customer?.supplierId?.businessName || 'AquaFlow Hub'}</p>
+               <p className="text-xs text-gray-500">{customer?.supplierId?.supportPhone || 'N/A'}</p>
              </div>
           </div>
 
           {rider ? (
-            <div className="p-5 bg-green-50/50 border border-green-100 rounded-2xl flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <img src={`https://ui-avatars.com/api/?name=${rider.name}&background=16a34a&color=fff`} className="w-12 h-12 rounded-full shadow-sm" alt="Rider" />
+            <div className="p-3 sm:p-4 bg-green-50/50 border border-green-100 rounded-xl flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <img src={`https://ui-avatars.com/api/?name=${rider.name}&background=16a34a&color=fff`} className="w-10 h-10 rounded-full shadow-sm" alt="Rider" />
                 <div>
-                  <p className="text-xs text-green-600 font-bold uppercase tracking-wider mb-0.5">{t("assigned_rider")}</p>
-                  <p className="font-bold text-gray-900 text-lg">{rider.name}</p>
+                  <p className="text-[10px] sm:text-xs text-green-600 font-bold uppercase tracking-wider mb-0.5">{t("assigned_rider")}</p>
+                  <p className="font-bold text-gray-900 text-sm sm:text-base">{rider.name}</p>
                 </div>
               </div>
               <a 
                 href={`https://wa.me/${rider.phone.replace(/[^0-9]/g, '')}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center shadow-md hover:shadow-lg transition-all shrink-0"
+                className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center shadow-sm transition-all shrink-0"
               >
-                <Phone className="w-5 h-5" />
+                <Phone className="w-4 h-4" />
               </a>
             </div>
           ) : (
-            <div className="p-5 bg-gray-50 border border-gray-100 border-dashed rounded-2xl flex items-center justify-center text-gray-400 font-medium">
+            <div className="p-3 sm:p-4 bg-gray-50 border border-gray-100 border-dashed rounded-xl flex items-center justify-center text-gray-400 text-sm font-medium">
               {t("no_rider_assigned")}
             </div>
           )}
         </div>
       </div>
+
+      {/* Recent Invoices Mini-Table */}
+      {invoices.length > 0 && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-4 py-3 sm:px-5 sm:py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <h3 className="font-bold text-gray-800 text-sm sm:text-base flex items-center gap-2">
+              <Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500" /> Recent Invoices
+            </h3>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {invoices.slice(0, 3).map(inv => (
+              <div key={inv._id} className="p-3 sm:p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+                <div>
+                  <p className="font-bold text-gray-900 text-sm sm:text-base">{new Date(inv.createdAt || inv.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                  <p className="text-[10px] sm:text-xs text-gray-500 font-medium">{inv.totalBottles} bottles @ ₨{inv.bottlePrice}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-black text-gray-900 text-sm sm:text-base">₨ {inv.totalAmount}</p>
+                  <div className={`inline-flex px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold uppercase mt-0.5 sm:mt-1 ${inv.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>
+                    {inv.paymentStatus}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -450,55 +517,7 @@ export function CustomerDashboard({ activeTab }) {
     </div>
   );
 
-  const renderProfile = () => (
-    <div className="max-w-2xl mx-auto animate-fadeIn">
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">{t("profile_settings")}</h2>
-            <p className="text-sm text-gray-500 mt-1">{t("manage_details")}</p>
-          </div>
-        </div>
-        <div className="p-8 space-y-8">
-          
-          {/* Language Preference */}
-          <div className="flex items-center justify-between p-4 bg-[#eff4ff] border border-[#dce9ff] rounded-2xl">
-            <div>
-              <p className="font-bold text-blue-900">{t("app_language")}</p>
-              <p className="text-xs text-blue-700 mt-0.5">{t("switch_language_desc")}</p>
-            </div>
-            <button 
-              onClick={toggleLanguage}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all shadow-sm"
-            >
-              <Globe className="w-4 h-4" />
-              {language === 'en' ? 'Switch to اردو' : 'Switch to English'}
-            </button>
-          </div>
 
-          <form onSubmit={handleProfileSubmit} className="space-y-5">
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">{t("full_name")}</label>
-              <input type="text" value={profileForm.fullName} onChange={e => setProfileForm(p => ({...p, fullName: e.target.value}))} className="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-medium" required />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">{t("phone")}</label>
-              <input type="text" value={profileForm.phone} onChange={e => setProfileForm(p => ({...p, phone: e.target.value}))} className="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-medium" required />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5">{t("default_delivery_address")}</label>
-              <textarea value={profileForm.address} onChange={e => setProfileForm(p => ({...p, address: e.target.value}))} rows="3" className="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-medium" required></textarea>
-            </div>
-            <div className="pt-4 border-t border-gray-100 flex justify-end">
-              <button type="submit" disabled={submitting} className="px-8 py-3.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 disabled:opacity-70 shadow-sm">
-                {t("save_changes")}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="p-4 md:p-8">
@@ -512,7 +531,6 @@ export function CustomerDashboard({ activeTab }) {
       {activeTab === 'request' && renderRequestDelivery()}
       {activeTab === 'orders' && renderOrderHistory()}
       {activeTab === 'billing' && renderBilling()}
-      {activeTab === 'profile' && renderProfile()}
     </div>
   );
 }

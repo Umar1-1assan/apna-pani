@@ -32,10 +32,22 @@ const CustomerSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'DeliveryBoy'
   },
-  monthlyBottles: {
+  bottlesPerDelivery: {
     type: Number,
     default: 2,
-    min: [1, 'Must order at least 1 bottle per month']
+    min: [1, 'Must order at least 1 bottle per delivery']
+  },
+  nextDeliveryDate: {
+    type: Date
+  },
+  lastDeliveryDate: {
+    type: Date
+  },
+  deliveryFrequency: {
+    type: Number,
+    default: 1,
+    min: [1, 'Delivery frequency must be at least 1 day'],
+    max: [30, 'Delivery frequency cannot exceed 30 days']
   },
   bottlePrice: {
     type: Number,
@@ -44,13 +56,26 @@ const CustomerSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['active', 'paused', 'blocked', 'pending_payment'],
+    enum: ['active', 'paused', 'blocked', 'pending_payment', 'cancelled'],
     default: 'active'
+  },
+  walletBalance: {
+    type: Number,
+    default: 0
   },
   billingCycle: {
     type: String,
-    enum: ['weekly', 'monthly'],
+    enum: ['weekly', 'fortnightly', 'monthly'],
     default: 'monthly'
+  },
+  deliveryCharges: {
+    type: Number,
+    default: 0
+  },
+  preferredDeliveryTime: {
+    type: String,
+    enum: ['any', 'morning', 'afternoon', 'evening'],
+    default: 'any'
   },
   createdAt: {
     type: Date,

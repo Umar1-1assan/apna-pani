@@ -535,3 +535,52 @@ th {
     padding-top: 1.25rem;
   }
 }
+
+/* Custom scrollbars for dashboard navigation and lists */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 99px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* Scrollbar polish for overflow tables and general light layout containers */
+[class*="bg-[#f8f9ff]"] ::-webkit-scrollbar,
+[class*="bg-[#f8f9ff]"]::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+[class*="bg-[#f8f9ff]"] ::-webkit-scrollbar-track,
+[class*="bg-[#f8f9ff]"]::-webkit-scrollbar-track {
+  background: transparent;
+}
+[class*="bg-[#f8f9ff]"] ::-webkit-scrollbar-thumb,
+[class*="bg-[#f8f9ff]"]::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 99px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+[class*="bg-[#f8f9ff]"] ::-webkit-scrollbar-thumb:hover,
+[class*="bg-[#f8f9ff]"]::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Utility to hide scrollbars completely while keeping them scrollable */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none !important; /* Firefox */
+}

@@ -4,6 +4,7 @@ import { LandingPage } from "./pages/LandingPage";
 import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { useAuthStore } from "./store/authStore";
+import { Toaster } from 'react-hot-toast';
 
 function RequireAuth({ children, roles }) {
   const { accessToken, user } = useAuthStore();
@@ -29,33 +30,36 @@ export default function App() {
   }
 
   return (
-    <Routes>
-      {/* Auth page — no layout wrapper */}
-      <Route path="/login" element={<LoginPage />} />
+    <>
+      <Routes>
+        {/* Auth page — no layout wrapper */}
+        <Route path="/login" element={<LoginPage />} />
 
-      {/* Dashboard page — unified sidebar shell layout (no default black topbar) */}
-      <Route
-        path="/dashboard"
-        element={
-          <RequireAuth>
-            <DashboardPage />
-          </RequireAuth>
-        }
-      />
+        {/* Dashboard page — unified sidebar shell layout (no default black topbar) */}
+        <Route
+          path="/dashboard"
+          element={
+            <RequireAuth>
+              <DashboardPage />
+            </RequireAuth>
+          }
+        />
 
-      {/* Landing page & other marketing pages use standard topbar layout */}
-      <Route
-        path="/*"
-        element={
-          <Layout token={accessToken} user={user} onLogout={handleLogout}>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              {/* Catch-all */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Layout>
-        }
-      />
-    </Routes>
+        {/* Landing page & other marketing pages use standard topbar layout */}
+        <Route
+          path="/*"
+          element={
+            <Layout token={accessToken} user={user} onLogout={handleLogout}>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                {/* Catch-all */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Layout>
+          }
+        />
+      </Routes>
+      <Toaster position="top-right" />
+    </>
   );
 }

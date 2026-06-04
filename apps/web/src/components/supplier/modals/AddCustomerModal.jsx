@@ -10,8 +10,12 @@ export function AddCustomerModal({ onClose, onSubmit, riders, submitting, formEr
     phone: "",
     address: "",
     notes: "",
-    monthlyBottles: "4",
+    bottlesPerDelivery: "4",
+    deliveryFrequency: "1",
     bottlePrice: "150",
+    deliveryCharges: "0",
+    preferredDeliveryTime: "any",
+    billingCycle: "monthly",
     deliveryBoyId: "",
     isActive: true
   });
@@ -124,10 +128,25 @@ export function AddCustomerModal({ onClose, onSubmit, riders, submitting, formEr
                   <input name="notes" value={form.notes} onChange={handleChange} className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm" placeholder="e.g. Leave by the back door" type="text" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-gray-600">Default Water Bottle Count (19L)</label>
+                  <label className="text-xs font-semibold text-gray-600">Delivery Volume (Bottles)</label>
                   <div className="relative">
-                    <input name="monthlyBottles" value={form.monthlyBottles} onChange={handleChange} min="1" type="number" required className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm" />
+                    <input name="bottlesPerDelivery" value={form.bottlesPerDelivery} onChange={handleChange} min="1" type="number" required className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm" />
                     <Droplets className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-600">Delivery Frequency</label>
+                  <div className="relative">
+                    <select name="deliveryFrequency" value={form.deliveryFrequency} onChange={handleChange} className="w-full pl-4 pr-10 py-2.5 appearance-none rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm bg-white">
+                      <option value="1">Daily</option>
+                      <option value="2">Every 2 Days</option>
+                      <option value="3">Every 3 Days</option>
+                      <option value="4">Every 4 Days</option>
+                      <option value="5">Every 5 Days</option>
+                      <option value="6">Every 6 Days</option>
+                      <option value="7">Weekly</option>
+                    </select>
+                    <svg className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -143,8 +162,44 @@ export function AddCustomerModal({ onClose, onSubmit, riders, submitting, formEr
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-600">Preferred Delivery Time</label>
+                  <div className="relative">
+                    <select name="preferredDeliveryTime" value={form.preferredDeliveryTime} onChange={handleChange} className="w-full pl-4 pr-10 py-2.5 appearance-none rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm bg-white">
+                      <option value="any">Any Time</option>
+                      <option value="morning">Morning (8 AM - 12 PM)</option>
+                      <option value="afternoon">Afternoon (12 PM - 4 PM)</option>
+                      <option value="evening">Evening (4 PM - 8 PM)</option>
+                    </select>
+                    <svg className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Section 4: Billing Preferences */}
+            <section>
+              <h3 className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-4 flex items-center gap-2">
+                <RefreshCw className="w-4 h-4" /> Billing Preferences
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-gray-600">Price per Bottle (₨)</label>
                   <input name="bottlePrice" value={form.bottlePrice} onChange={handleChange} required min="1" type="number" className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-600">Delivery Charges (₨)</label>
+                  <input name="deliveryCharges" value={form.deliveryCharges} onChange={handleChange} required min="0" type="number" className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-gray-600">Billing Cycle</label>
+                  <div className="relative">
+                    <select name="billingCycle" value={form.billingCycle} onChange={handleChange} className="w-full pl-4 pr-10 py-2.5 appearance-none rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm bg-white">
+                      <option value="weekly">Weekly</option>
+                      <option value="fortnightly">Fortnightly (15 Days)</option>
+                      <option value="monthly">Monthly</option>
+                    </select>
+                    <svg className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </div>
                 </div>
               </div>
             </section>

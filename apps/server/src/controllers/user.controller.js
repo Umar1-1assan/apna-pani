@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const Supplier = require('../models/Supplier');
+const Customer = require('../models/Customer');
+const DeliveryBoy = require('../models/DeliveryBoy');
 const {
   ok,
   created,
@@ -9,6 +11,106 @@ const {
 } = require('../utils/apiResponse');
 const { normalizePhone, isValidPhone } = require('../utils/phoneUtils');
 const { asyncHandler } = require('../middleware/auth.middleware');
+
+/**
+ * GET /api/users/profile
+ * Protected: Get the logged-in user profile, including role-specific profile details
+ */
+const getProfileHandler = asyncHandler(async (req, res) => {
+  const user = req.user;
+  let roleProfile = null;
+
+  if (user.role === 'supplier') {
+    roleProfile = await Supplier.findOne({ userId: user._id });
+  } else if (user.role === 'delivery_boy') {
+    roleProfile = await DeliveryBoy.findOne({ userId: user._id }).populate('supplierId');
+  } else if (user.role === 'customer') {
+    roleProfile = await Customer.findOne({ userId: user._id }).populate('supplierId');
+  }
+
+  return ok(res, { user, roleProfile }, 'Profile retrieved successfully');
+});
+
+/**
+ * PUT /api/users/profile
+ * Protected: Update core user details and role-specific details
+ */
+const updateProfileHandler = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const {
+    fullName,
+    phone,
+    email,
+    password,
+    businessName,
+    address,
+    areaName
+  } = req.body;
+
+  // Update core user details
+  if (fullName) user.fullName = fullName.trim();
+  if (email !== undefined) user.email = email ? email.toLowerCase().trim() : null;
+  
+  if (phone) {
+    const normalizedPhone = normalizePhone(phone);
+    if (!isValidPhone(normalizedPhone)) {
+      return badRequest(res, 'Invalid Pakistani phone number. Use format: 03XXXXXXXXX or +923XXXXXXXXX');
+    }
+    // Check if new phone is already in use by another user
+    if (normalizedPhone !== user.phone) {
+      const existingUser = await User.findOne({ phone: normalizedPhone, _id: { $ne: user._id } });
+      if (existingUser) {
+        return conflict(res, 'Phone number already registered to another account');
+      }
+      user.phone = normalizedPhone;
+    }
+  }
+
+  if (password) {
+    if (password.length < 6) {
+      return badRequest(res, 'Password must be at least 6 characters');
+    }
+    user.password = password;
+    user.passwordText = password;
+  }
+
+  await user.save();
+
+  // Update role-specific details
+  let roleProfile = null;
+  if (user.role === 'supplier') {
+    roleProfile = await Supplier.findOne({ userId: user._id });
+    if (roleProfile) {
+      if (businessName !== undefined) roleProfile.businessName = businessName ? businessName.trim() : null;
+      if (address !== undefined) roleProfile.address = address ? address.trim() : null;
+      if (req.body.operatingDays !== undefined) roleProfile.operatingDays = req.body.operatingDays;
+      await roleProfile.save();
+    }
+  } else if (user.role === 'delivery_boy') {
+    roleProfile = await DeliveryBoy.findOne({ userId: user._id });
+    if (roleProfile) {
+      if (areaName) roleProfile.areaName = areaName.trim();
+      await roleProfile.save();
+    }
+  } else if (user.role === 'customer') {
+    roleProfile = await Customer.findOne({ userId: user._id });
+    if (roleProfile) {
+      if (address !== undefined) roleProfile.address = address ? address.trim() : null;
+      if (req.body.bottlesPerDelivery !== undefined) roleProfile.bottlesPerDelivery = parseInt(req.body.bottlesPerDelivery) || 1;
+      if (req.body.deliveryFrequency !== undefined) roleProfile.deliveryFrequency = parseInt(req.body.deliveryFrequency) || 1;
+      await roleProfile.save();
+
+      // Emit real-time event to supplier
+      const io = req.app.get('io');
+      if (io && roleProfile.supplierId) {
+        const populatedCustomer = await Customer.findById(roleProfile._id).populate('userId', 'fullName phone email isActive username passwordText');
+        io.to(roleProfile.supplierId.toString()).emit('customerUpdated', populatedCustomer);
+      }
+    }
+  }
+
+  return ok(res, { user, roleProfile }, 'Profile updated successfully');
+});
 
 /**
  * GET /api/users/suppliers
@@ -254,14 +356,19 @@ const registerCustomerHandler = asyncHandler(async (req, res) => {
     password,
     phone,
     fullName,
-    monthlyBottles,
+    bottlesPerDelivery,
     bottlePrice,
     billingCycle,
     address,
     area,
     whatsappPhone,
     latitude,
-    longitude
+    longitude,
+    email,
+    deliveryBoyId,
+    deliveryCharges,
+    preferredDeliveryTime,
+    deliveryFrequency
   } = req.body;
 
   // Retrieve supplierId from the authenticated tenant scope
@@ -308,12 +415,20 @@ const registerCustomerHandler = asyncHandler(async (req, res) => {
     return conflict(res, 'Phone number already registered');
   }
 
+  if (email) {
+    const existingEmail = await User.findOne({ email: email.toLowerCase().trim() });
+    if (existingEmail) {
+      return conflict(res, 'Email already registered');
+    }
+  }
+
   const user = new User({
     username: username.toLowerCase().trim(),
     password,
     passwordText: password,
     phone: normalizedPhone,
     fullName: fullName.trim(),
+    email: email ? email.toLowerCase().trim() : null,
     role: 'customer',
     isActive: true
   });
@@ -326,9 +441,13 @@ const registerCustomerHandler = asyncHandler(async (req, res) => {
     userId: user._id,
     phoneNumber: normalizedPhone, // Customer.js schema defines "phoneNumber" (let's map it safely)
     address: address.trim(),
-    monthlyBottles: parseInt(monthlyBottles) || 2,
+    bottlesPerDelivery: parseInt(bottlesPerDelivery) || 2,
+    deliveryFrequency: parseInt(deliveryFrequency) || 1,
     bottlePrice: parseFloat(bottlePrice),
     billingCycle: billingCycle || 'monthly',
+    deliveryBoyId: deliveryBoyId || null,
+    deliveryCharges: parseFloat(deliveryCharges) || 0,
+    preferredDeliveryTime: preferredDeliveryTime || 'any',
     status: 'active',
     location: {
       type: 'Point',
@@ -355,7 +474,8 @@ const registerCustomerHandler = asyncHandler(async (req, res) => {
     customer: {
       _id: customer._id,
       address: customer.address,
-      monthlyBottles: customer.monthlyBottles,
+      bottlesPerDelivery: customer.bottlesPerDelivery,
+      deliveryFrequency: customer.deliveryFrequency,
       bottlePrice: customer.bottlePrice,
       billingCycle: customer.billingCycle
     }
@@ -366,5 +486,7 @@ module.exports = {
   listSuppliersHandler,
   registerSupplierHandler,
   registerRiderHandler,
-  registerCustomerHandler
+  registerCustomerHandler,
+  getProfileHandler,
+  updateProfileHandler
 };

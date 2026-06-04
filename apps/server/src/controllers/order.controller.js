@@ -5,11 +5,15 @@ const { ok, badRequest, notFound } = require('../utils/apiResponse');
 
 exports.createOrder = async (req, res, next) => {
   try {
-    const { quantity, deliveryAddress, timeSlot, paymentMethod, productType, notes } = req.body;
+    const { quantity, deliveryAddress, timeSlot, paymentMethod, productType, notes, deliveryType } = req.body;
     
     // Validate
     if (!quantity || !deliveryAddress) {
       return badRequest(res, 'Quantity and delivery address are required');
+    }
+
+    if (quantity < 1) {
+      return badRequest(res, 'Minimum quantity is 1');
     }
 
     let customer;
@@ -23,20 +27,80 @@ exports.createOrder = async (req, res, next) => {
       return notFound(res, 'Customer not found');
     }
 
+    // Validation: Account Status
+    if (customer.status !== 'active') {
+      return badRequest(res, `Customer account is ${customer.status}. Cannot place order.`);
+    }
+
+    // Validation: Balance Limit (cutoff -500 PKR)
+    if (customer.walletBalance < -500) {
+      return badRequest(res, 'Wallet balance is too low. Please clear your dues before ordering.');
+    }
+
+    // Fetch Supplier to check stock
+    const Supplier = require('../models/Supplier');
+    const supplier = await Supplier.findById(req.supplierId);
+    if (!supplier) {
+      return notFound(res, 'Supplier not found');
+    }
+
+    // Validation: Stock Check
+    if (supplier.availableStock < quantity) {
+      return badRequest(res, 'Insufficient stock available.');
+    }
+
+    // Validation: Time Slot Cutoff (10 PM Pakistan Time)
+    const now = new Date();
+    const utcHours = now.getUTCHours();
+    const pktHours = (utcHours + 5) % 24;
+    
+    let finalTimeSlot = timeSlot || 'morning';
+    let deliveryDate = new Date();
+    
+    if (finalTimeSlot === 'morning' && pktHours >= 22) {
+      finalTimeSlot = 'afternoon';
+    }
+
+    // Validation: Overlap Detection
+    const startOfDay = new Date(deliveryDate);
+    startOfDay.setUTCHours(0,0,0,0);
+    const endOfDay = new Date(deliveryDate);
+    endOfDay.setUTCHours(23,59,59,999);
+
+    const existingOrder = await Order.findOne({
+      customerId: customer._id,
+      deliveryDate: { $gte: startOfDay, $lte: endOfDay },
+      status: { $nin: ['failed', 'cancelled', 'completed', 'delivered'] }
+    });
+
+    if (existingOrder) {
+      return badRequest(res, 'An order is already scheduled for today.');
+    }
+
+    // Execution
     const bottlePrice = customer.bottlePrice || 150;
-    const totalAmount = quantity * bottlePrice;
+    const finalDeliveryType = deliveryType || 'standard';
+    const deliveryFee = finalDeliveryType === 'express' ? 50 : 0;
+    const totalAmount = (quantity * bottlePrice) + deliveryFee;
+
+    // Deduct from available, add to reserved
+    supplier.availableStock -= quantity;
+    supplier.reservedStock += quantity;
+    await supplier.save();
 
     const order = new Order({
-      supplierId: req.supplierId, // Extracted from auth middleware
+      supplierId: req.supplierId, 
       customerId: customer._id,
       quantity,
       deliveryAddress,
-      timeSlot,
+      timeSlot: finalTimeSlot,
       paymentMethod,
       productType,
+      deliveryType: finalDeliveryType,
+      deliveryFee,
       notes,
       totalAmount,
-      deliveryDate: new Date(),
+      deliveryDate: deliveryDate,
       statusTimeline: [{
         status: 'pending',
         actorRole: req.user.role,
@@ -47,13 +111,12 @@ exports.createOrder = async (req, res, next) => {
     await order.save();
     
     // Generate Invoice automatically
-    const now = new Date();
     const invoice = new Invoice({
       supplierId: req.supplierId,
       customerId: customer._id,
       orderId: order._id,
-      month: now.getMonth() + 1,
-      year: now.getFullYear(),
+      month: deliveryDate.getMonth() + 1,
+      year: deliveryDate.getFullYear(),
       totalBottles: quantity,
       bottlePrice: bottlePrice,
       totalAmount: totalAmount,
@@ -148,39 +211,67 @@ exports.updateOrderStatus = async (req, res, next) => {
     const { id } = req.params;
     const { status, paymentStatus, emptyCarboysReturned, failureReason } = req.body;
 
-    const updateFields = { status };
-    if (paymentStatus) updateFields.paymentStatus = paymentStatus;
-    if (emptyCarboysReturned !== undefined) updateFields.emptyCarboysReturned = emptyCarboysReturned;
-    if (failureReason) updateFields.failureReason = failureReason;
+    const order = await Order.findById(id);
+    if (!order) return notFound(res, 'Order not found');
 
-    const updateQuery = {
-      $set: updateFields
-    };
-
-    if (status) {
-      updateQuery.$push = {
-        statusTimeline: {
-          status: status,
-          actorRole: req.user.role,
-          actorId: req.user.userId
-        }
-      };
-      
-      // If marking as paid, update paymentReceivedAt
+    const previousStatus = order.status;
+    
+    if (status) order.status = status;
+    if (paymentStatus) {
+      order.paymentStatus = paymentStatus;
       if (paymentStatus === 'paid') {
-        updateFields.paymentReceivedAt = new Date();
+        order.paymentReceivedAt = new Date();
+      }
+    }
+    if (emptyCarboysReturned !== undefined) order.emptyCarboysReturned = emptyCarboysReturned;
+    if (failureReason) order.failureReason = failureReason;
+
+    if (status && status !== previousStatus) {
+      order.statusTimeline.push({
+        status: status,
+        actorRole: req.user.role,
+        actorId: req.user.userId
+      });
+
+      const Supplier = require('../models/Supplier');
+      const Customer = require('../models/Customer');
+      const Invoice = require('../models/Invoice');
+      
+      const supplier = await Supplier.findById(order.supplierId);
+      const customer = await Customer.findById(order.customerId);
+
+      const terminalStates = ['delivered', 'completed', 'failed', 'cancelled'];
+      
+      // If moving INTO a terminal state from a non-terminal state
+      if (terminalStates.includes(status) && !terminalStates.includes(previousStatus)) {
+        if (status === 'delivered' || status === 'completed') {
+          // Permanently deduct from reservedStock
+          if (supplier) {
+             supplier.reservedStock = Math.max(0, supplier.reservedStock - order.quantity);
+             if (order.emptyCarboysReturned) supplier.emptyCarboys += order.emptyCarboysReturned;
+             await supplier.save();
+          }
+          
+          // If unpaid, deduct from customer's wallet balance
+          if (order.paymentStatus !== 'paid' && customer) {
+             customer.walletBalance -= order.totalAmount;
+             await customer.save();
+          }
+        } else if (status === 'failed' || status === 'cancelled') {
+          // Revert reserved stock to available
+          if (supplier) {
+             supplier.reservedStock = Math.max(0, supplier.reservedStock - order.quantity);
+             supplier.availableStock += order.quantity;
+             await supplier.save();
+          }
+          
+          // Void the unpaid invoice
+          await Invoice.findOneAndDelete({ orderId: order._id, paymentStatus: 'unpaid' });
+        }
       }
     }
 
-    const order = await Order.findOneAndUpdate(
-      { _id: id },
-      updateQuery,
-      { new: true }
-    );
-
-    if (!order) {
-      return notFound(res, 'Order not found');
-    }
+    await order.save();
 
     // If order payment is marked paid, update the associated invoice
     if (paymentStatus === 'paid') {
@@ -248,26 +339,40 @@ exports.confirmOrderReceipt = async (req, res, next) => {
       return notFound(res, 'Customer not found');
     }
 
-    const order = await Order.findOneAndUpdate(
-      { _id: id, customerId: customer._id },
-      {
-        status: 'completed',
-        customerConfirmed: true,
-        customerConfirmedAt: new Date(),
-        $push: {
-          statusTimeline: {
-            status: 'completed',
-            actorRole: 'customer',
-            actorId: req.user.userId
-          }
-        }
-      },
-      { new: true }
-    );
-
+    const order = await Order.findOne({ _id: id, customerId: customer._id });
     if (!order) {
       return notFound(res, 'Order not found');
     }
+
+    const previousStatus = order.status;
+
+    order.status = 'completed';
+    order.customerConfirmed = true;
+    order.customerConfirmedAt = new Date();
+    order.statusTimeline.push({
+      status: 'completed',
+      actorRole: 'customer',
+      actorId: req.user.userId
+    });
+
+    const terminalStates = ['delivered', 'completed', 'failed', 'cancelled'];
+    if (!terminalStates.includes(previousStatus)) {
+      const Supplier = require('../models/Supplier');
+      const supplier = await Supplier.findById(order.supplierId);
+      
+      if (supplier) {
+          supplier.reservedStock = Math.max(0, supplier.reservedStock - order.quantity);
+          if (order.emptyCarboysReturned) supplier.emptyCarboys += order.emptyCarboysReturned;
+          await supplier.save();
+      }
+      
+      if (order.paymentStatus !== 'paid') {
+          customer.walletBalance -= order.totalAmount;
+          await customer.save();
+      }
+    }
+
+    await order.save();
 
     // Emit event to supplier
     const io = req.app.get('io');
@@ -276,6 +381,60 @@ exports.confirmOrderReceipt = async (req, res, next) => {
     }
 
     return ok(res, order, 'Order receipt confirmed successfully');
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.cancelOrder = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    
+    const order = await Order.findOne({ _id: id });
+    if (!order) {
+      return notFound(res, 'Order not found');
+    }
+
+    // Ensure customer owns the order (if customer is cancelling)
+    if (req.user.role === 'customer') {
+      const customer = await Customer.findOne({ userId: req.user.userId });
+      if (!customer || order.customerId.toString() !== customer._id.toString()) {
+         return badRequest(res, 'Unauthorized to cancel this order');
+      }
+    }
+
+    if (order.status !== 'pending') {
+      return badRequest(res, `Cannot cancel order in ${order.status} status.`);
+    }
+
+    order.status = 'cancelled';
+    order.statusTimeline.push({
+      status: 'cancelled',
+      actorRole: req.user.role,
+      actorId: req.user.userId
+    });
+
+    await order.save();
+
+    // Return stock
+    const Supplier = require('../models/Supplier');
+    const supplier = await Supplier.findById(order.supplierId);
+    if (supplier) {
+      supplier.reservedStock -= order.quantity;
+      supplier.availableStock += order.quantity;
+      await supplier.save();
+    }
+
+    // Void Invoice
+    await Invoice.findOneAndDelete({ orderId: order._id, paymentStatus: 'unpaid' });
+
+    // Emit real-time event to supplier dashboard
+    const io = req.app.get('io');
+    if (io && order.supplierId) {
+      io.to(order.supplierId.toString()).emit('orderUpdated', order);
+    }
+
+    return ok(res, order, 'Order cancelled successfully');
   } catch (error) {
     next(error);
   }

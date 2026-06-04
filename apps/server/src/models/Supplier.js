@@ -51,6 +51,10 @@ const SupplierSchema = new mongoose.Schema({
     enum: ['basic', 'standard', 'enterprise'],
     default: 'basic'
   },
+  planStartsAt: {
+    type: Date,
+    default: Date.now
+  },
   planExpiresAt: {
     type: Date
   },
@@ -75,6 +79,22 @@ const SupplierSchema = new mongoose.Schema({
   totalRiders: {
     type: Number,
     default: 0
+  },
+  availableStock: {
+    type: Number,
+    default: 0
+  },
+  reservedStock: {
+    type: Number,
+    default: 0
+  },
+  emptyCarboys: {
+    type: Number,
+    default: 0
+  },
+  operatingDays: {
+    type: [Number],
+    default: [1, 2, 3, 4, 5, 6] // 0: Sun, 1: Mon, 2: Tue, 3: Wed, 4: Thu, 5: Fri, 6: Sat
   },
   isActive: {
     type: Boolean,
