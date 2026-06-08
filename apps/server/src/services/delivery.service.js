@@ -34,6 +34,11 @@ async function generateDeliveriesForSupplier(supplierId, io = null) {
       return { success: true, count: 0, message: 'Today is an off-day for this supplier. No deliveries generated.' };
     }
 
+    // Fetch the supplier's first active product to use as default productType
+    const Product = require('../models/Product');
+    const defaultProduct = await Product.findOne({ supplierId: supplierId, isAvailable: true });
+    const fallbackProductType = defaultProduct ? defaultProduct.name : 'Standard Product';
+
     // Fetch all active customers for this supplier
     const customers = await Customer.find({ supplierId: supplierId, status: 'active' });
     let generatedCount = 0;
@@ -76,7 +81,7 @@ async function generateDeliveriesForSupplier(supplierId, io = null) {
           supplierId: customer.supplierId,
           customerId: customer._id,
           deliveryBoyId: customer.deliveryBoyId || null,
-          productType: '19L carboy',
+          productType: fallbackProductType,
           quantity: customer.bottlesPerDelivery || 1,
           deliveryDate: today,
           timeSlot: customer.preferredDeliveryTime !== 'any' ? customer.preferredDeliveryTime : 'morning',
@@ -84,7 +89,7 @@ async function generateDeliveriesForSupplier(supplierId, io = null) {
           deliveryType: 'standard',
           deliveryFee: customer.deliveryCharges || 0,
           status: customer.deliveryBoyId ? 'assigned' : 'pending',
-          paymentMethod: 'COD',
+          paymentMethod: 'Billed_Later',
           totalAmount: ((customer.bottlesPerDelivery || 1) * (customer.bottlePrice || 0)) + (customer.deliveryCharges || 0),
           notes: 'Auto-generated delivery based on schedule'
         });

@@ -7,7 +7,7 @@ const { ok } = require('../utils/apiResponse');
  * Protected Admin Routes
  */
 
-const { registerSupplierHandler } = require('../controllers/user.controller');
+const { registerSupplierHandler } = require('../controllers/users');
 const Supplier = require('../models/Supplier');
 
 // GET /api/admin/suppliers

@@ -10,7 +10,7 @@ const {
   getRiderEodSummary,
   confirmOrderReceipt,
   cancelOrder
-} = require('../controllers/order.controller');
+} = require('../controllers/orders');
 
 // Create Order (Customer or Supplier can create)
 // Supplier can create order manually for walk-in or phone call

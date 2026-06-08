@@ -26,16 +26,16 @@ function initCronJobs(io) {
     }
   });
 
-  // End of Month Billing Job (Placeholder logic)
-  cron.schedule('55 23 28-31 * *', async () => {
-    // Logic to run only on the last day of the month
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    if (tomorrow.getDate() === 1) {
-      console.log('[CRON] Running End of Month Billing Generation...');
-      // Future logic: Aggregate walletBalances into Invoices
+  // Billing Cycle Invoice Generation Job
+  // Run every day at 1:00 AM
+  cron.schedule('0 1 * * *', async () => {
+    console.log('[CRON] Starting Billing Cycle Invoice Generation Job...');
+    const { generateBillingCycleInvoices } = require('../services/invoice.service');
+    try {
+      const result = await generateBillingCycleInvoices(io);
+      console.log(`[CRON] Billing Generation Complete. ${result.message}`);
+    } catch (error) {
+      console.error('[CRON] Error in Billing Generation Job:', error);
     }
   });
 }

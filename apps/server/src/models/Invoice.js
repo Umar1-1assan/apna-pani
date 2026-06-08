@@ -11,20 +11,32 @@ const InvoiceSchema = new mongoose.Schema({
     ref: 'Customer',
     required: [true, 'Customer ID is required']
   },
-  orderId: {
+  orderIds: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Order'
+  }],
+  billingCycle: {
+    type: String,
+    enum: ['weekly', 'fortnightly', 'monthly', 'ad-hoc'],
+    default: 'ad-hoc'
   },
-  month: {
-    type: Number,
-    required: [true, 'Month is required'],
-    min: [1, 'Month must be 1-12'],
-    max: [12, 'Month must be 1-12']
+  startDate: {
+    type: Date
   },
-  year: {
-    type: Number,
-    required: [true, 'Year is required'],
-    min: [2020, 'Year must be 2020 or later']
+  endDate: {
+    type: Date
+  },
+  dueDate: {
+    type: Date
+  },
+  collectionMethod: {
+    type: String,
+    enum: ['online', 'cash'],
+    default: 'cash'
+  },
+  collectionRiderId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'DeliveryBoy'
   },
   totalAmount: {
     type: Number,
@@ -49,6 +61,15 @@ const InvoiceSchema = new mongoose.Schema({
     default: 0,
     min: [0, 'Cannot be negative']
   },
+  arrearsDetails: [{
+    invoiceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Invoice'
+    },
+    invoiceStringId: String,
+    period: String,
+    amountDue: Number
+  }],
   discounts: {
     type: Number,
     default: 0,
@@ -61,7 +82,7 @@ const InvoiceSchema = new mongoose.Schema({
   },
   paymentStatus: {
     type: String,
-    enum: ['unpaid', 'partial', 'paid'],
+    enum: ['unpaid', 'partial', 'pending_confirmation', 'paid'],
     default: 'unpaid'
   },
   pdfUrl: String,
@@ -92,7 +113,7 @@ InvoiceSchema.virtual('subtotal').get(function() {
 // Indexes
 InvoiceSchema.index({ supplierId: 1 });
 InvoiceSchema.index({ customerId: 1 });
-InvoiceSchema.index({ month: 1, year: 1 });
+InvoiceSchema.index({ startDate: 1, endDate: 1 });
 
 const Invoice = mongoose.model('Invoice', InvoiceSchema);
 

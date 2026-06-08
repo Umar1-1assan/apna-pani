@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { requireRole, asyncHandler } = require('../middleware/auth.middleware');
 const { ok } = require('../utils/apiResponse');
-const { registerRiderHandler, registerCustomerHandler } = require('../controllers/user.controller');
+const { registerRiderHandler, registerCustomerHandler } = require('../controllers/users');
 const Supplier = require('../models/Supplier');
 const DeliveryBoy = require('../models/DeliveryBoy');
 const Customer = require('../models/Customer');
@@ -51,6 +51,69 @@ router.put('/me',
     
     await supplier.save();
     return ok(res, supplier, 'Supplier profile updated');
+  })
+);
+
+// GET /api/suppliers/billing-overview
+router.get('/billing-overview',
+  requireRole('supplier'),
+  asyncHandler(async (req, res) => {
+    const Order = require('../models/Order');
+    
+    // 1. Fetch all active customers for this supplier
+    const customers = await Customer.find({ supplierId: req.supplierId })
+      .populate('userId', 'fullName phone email');
+      
+    // 2. Fetch unbilled orders for these customers
+    const unbilledOrders = await Order.find({
+      supplierId: req.supplierId,
+      $or: [
+        { isBilled: false },
+        { isBilled: { $exists: false } }
+      ],
+      status: { $in: ['completed', 'delivered'] }
+    });
+    
+    // 3. Map orders to customers
+    const unbilledByCustomer = unbilledOrders.reduce((acc, order) => {
+      const custId = order.customerId.toString();
+      if (!acc[custId]) {
+        acc[custId] = { totalBottles: 0, totalAmount: 0 };
+      }
+      acc[custId].totalBottles += order.quantity;
+      acc[custId].totalAmount += order.totalAmount;
+      return acc;
+    }, {});
+    
+    const billingData = customers.map(c => {
+      const custId = c._id.toString();
+      
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const referenceDate = c.lastInvoiceDate || c.createdAt;
+      const cycleLength = {
+        'weekly': 7,
+        'fortnightly': 14,
+        'monthly': 30
+      }[c.billingCycle || 'monthly'] || 30;
+      
+      const nextInvoiceDate = new Date(referenceDate);
+      nextInvoiceDate.setDate(nextInvoiceDate.getDate() + cycleLength);
+
+      return {
+        _id: c._id,
+        customerName: c.userId?.fullName || 'Walk-in Customer',
+        phone: c.userId?.phone || c.phoneNumber,
+        billingCycle: c.billingCycle || 'monthly',
+        bottlePrice: c.bottlePrice || 0,
+        unbilledBottles: unbilledByCustomer[custId]?.totalBottles || 0,
+        unbilledAmount: unbilledByCustomer[custId]?.totalAmount || 0,
+        lastInvoiceDate: c.lastInvoiceDate,
+        nextInvoiceDate: nextInvoiceDate
+      };
+    });
+    
+    return ok(res, billingData, 'Billing overview retrieved');
   })
 );
 
@@ -161,7 +224,7 @@ router.post('/riders',
 router.put('/riders/:id',
   requireRole('supplier'),
   asyncHandler(async (req, res) => {
-    const { fullName, phone, password, areaName, shiftTiming, assignedVehicle, licenseNumber } = req.body;
+    const { fullName, phone, password, areaName, shiftTiming, assignedVehicle, licenseNumber, isActive } = req.body;
     
     const DeliveryBoy = require('../models/DeliveryBoy');
     const rider = await DeliveryBoy.findOne({ _id: req.params.id, supplierId: req.supplierId });
@@ -171,6 +234,7 @@ router.put('/riders/:id',
     if (shiftTiming) rider.shiftTiming = shiftTiming;
     if (assignedVehicle !== undefined) rider.assignedVehicle = assignedVehicle;
     if (licenseNumber !== undefined) rider.licenseNumber = licenseNumber;
+    if (isActive !== undefined) rider.isActive = isActive;
     await rider.save();
 
     const User = require('../models/User');
@@ -178,6 +242,8 @@ router.put('/riders/:id',
       const user = await User.findById(rider.userId);
       if (user) {
         if (fullName) user.fullName = fullName;
+        if (phone) user.phone = phone;
+        if (isActive !== undefined) user.isActive = isActive;
         if (phone) user.phone = phone;
         if (password) {
           user.password = password;
@@ -291,35 +357,6 @@ router.get('/products',
     let products = await Product.find({ supplierId: req.supplierId })
       .sort({ createdAt: -1 });
 
-    if (products.length === 0) {
-      const defaults = [
-        {
-          supplierId: req.supplierId,
-          name: '19L carboy',
-          description: 'Standard 19 Litre Water Gallon',
-          price: 150,
-          isAvailable: true
-        },
-        {
-          supplierId: req.supplierId,
-          name: 'refill',
-          description: 'Refill of standard 19 Litre Bottle',
-          price: 100,
-          isAvailable: true
-        },
-        {
-          supplierId: req.supplierId,
-          name: 'bottles',
-          description: 'Pack of small water bottles',
-          price: 200,
-          isAvailable: true
-        }
-      ];
-      await Product.insertMany(defaults);
-      products = await Product.find({ supplierId: req.supplierId })
-        .sort({ createdAt: -1 });
-    }
-
     return ok(res, products, 'List of products');
   })
 );
@@ -387,6 +424,30 @@ router.patch('/products/:id/toggle',
     await product.save();
 
     return ok(res, product, `Product is now ${product.isAvailable ? 'available' : 'unavailable'}`);
+  })
+);
+
+// PUT /api/suppliers/riders/:id/receive-cash
+router.put('/riders/:id/receive-cash',
+  requireRole('supplier'),
+  asyncHandler(async (req, res) => {
+    const deliveryBoy = await DeliveryBoy.findOne({ _id: req.params.id, supplierId: req.supplierId });
+    
+    if (!deliveryBoy) {
+      return res.status(404).json({ success: false, message: 'Rider not found' });
+    }
+
+    if (!deliveryBoy.cashInHand || deliveryBoy.cashInHand <= 0) {
+      return res.status(400).json({ success: false, message: 'Rider has no cash in hand to remit' });
+    }
+
+    const remittedAmount = deliveryBoy.cashInHand;
+    deliveryBoy.totalCashRemitted = (deliveryBoy.totalCashRemitted || 0) + remittedAmount;
+    deliveryBoy.cashInHand = 0;
+    
+    await deliveryBoy.save();
+
+    return ok(res, deliveryBoy, `Successfully received ₨ ${remittedAmount} from rider.`);
   })
 );
 

@@ -29,6 +29,14 @@ const DeliveryBoySchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  cashInHand: {
+    type: Number,
+    default: 0
+  },
+  totalCashRemitted: {
+    type: Number,
+    default: 0
+  },
   assignedCustomers: {
     type: Number,
     default: 0

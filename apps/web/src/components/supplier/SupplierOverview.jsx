@@ -124,7 +124,7 @@ export function SupplierOverview({ customers, riders, orders, supplierProfile })
               <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">{t('todays_revenue')}</p>
               <h3 className="text-3xl font-black text-gray-900">
                 <span className="text-xl text-gray-400 font-bold mr-1">$</span>
-                {(totalRevenueCollected || 485.50).toFixed(2)}
+                {(totalRevenueCollected || 0).toFixed(2)}
               </h3>
             </div>
           </div>
@@ -212,8 +212,8 @@ export function SupplierOverview({ customers, riders, orders, supplierProfile })
             </div>
           </div>
           
-          <div className="p-6 h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="p-6 h-[300px] w-full min-w-0 min-h-0">
+            <ResponsiveContainer width="99%" height="100%">
               <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">

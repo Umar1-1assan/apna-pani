@@ -65,6 +65,7 @@ const injectTenantScope = async (req, res, next) => {
       }
       req.supplierId = deliveryBoy.supplierId;
       req.deliveryBoyId = deliveryBoy._id;
+      req.riderId = deliveryBoy._id; // alias for controllers that use req.riderId
       req.tenantScoped = true;
       return next();
     }

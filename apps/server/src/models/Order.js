@@ -21,8 +21,7 @@ const OrderSchema = new mongoose.Schema({
   },
   productType: {
     type: String,
-    enum: ['19L carboy', 'refill', 'bottles'],
-    default: '19L carboy'
+    required: true
   },
   quantity: {
     type: Number,
@@ -62,6 +61,14 @@ const OrderSchema = new mongoose.Schema({
     actorRole: { type: String, enum: ['system', 'supplier', 'delivery_boy', 'customer'] },
     actorId: mongoose.Schema.Types.ObjectId
   }],
+  isBilled: {
+    type: Boolean,
+    default: false
+  },
+  invoiceId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Invoice'
+  },
   customerConfirmed: {
     type: Boolean,
     default: false
@@ -69,7 +76,7 @@ const OrderSchema = new mongoose.Schema({
   customerConfirmedAt: Date,
   paymentMethod: {
     type: String,
-    enum: ['COD', 'Easypaisa', 'JazzCash', 'Credit'],
+    enum: ['COD', 'Easypaisa', 'JazzCash', 'Credit', 'Billed_Later'],
     default: 'COD'
   },
   paymentStatus: {

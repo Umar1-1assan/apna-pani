@@ -16,6 +16,18 @@ export function LoginPage() {
   const navigate = useNavigate();
   const login = useAuthStore((s) => s.login);
 
+  // Force login page to always be LTR English regardless of saved language preference
+  useEffect(() => {
+    const savedDir = document.documentElement.getAttribute('dir');
+    const savedLang = document.documentElement.getAttribute('lang');
+    document.documentElement.setAttribute('dir', 'ltr');
+    document.documentElement.setAttribute('lang', 'en');
+    return () => {
+      // Restore direction when navigating away (dashboard will set its own)
+      if (savedDir) document.documentElement.setAttribute('dir', savedDir);
+      if (savedLang) document.documentElement.setAttribute('lang', savedLang);
+    };
+  }, []);
   // States: "login" | "forgot" | "reset"
   const [viewState, setViewState] = useState("login");
   const [loading, setLoading] = useState(false);

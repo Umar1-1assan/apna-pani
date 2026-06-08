@@ -4,6 +4,13 @@ import { useTranslation } from '../../contexts/LanguageContext';
 import { CheckCircle2, AlertTriangle, ArrowRight, UserCheck, XCircle, FileText, CalendarDays, DollarSign } from 'lucide-react';
 import { ConfirmationModal } from '../../components/ConfirmationModal';
 
+const getLocalDateString = (d = new Date()) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export function AdminSubscriptions() {
   const { t } = useTranslation();
   const [data, setData] = useState({ requests: [], suppliers: [] });
@@ -15,8 +22,8 @@ export function AdminSubscriptions() {
     isOpen: false,
     request: null,
     amount: 0,
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0]
+    startDate: getLocalDateString(),
+    endDate: getLocalDateString(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000))
   });
 
   const [rejectModal, setRejectModal] = useState({
@@ -60,8 +67,8 @@ export function AdminSubscriptions() {
       request: req,
       isDowngrade,
       amount: amt,
-      startDate: new Date().toISOString().split('T')[0],
-      endDate: new Date(new Date().setDate(new Date().getDate() + 30)).toISOString().split('T')[0]
+      startDate: getLocalDateString(),
+      endDate: getLocalDateString(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000))
     });
   };
 

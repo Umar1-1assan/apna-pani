@@ -8,21 +8,12 @@ export function AddRiderModal({ onClose, onSubmit, submitting, formError }) {
     email: "",
     username: "",
     password: "",
-    shiftTiming: "Morning (06:00 - 14:00)",
-    assignedVehicle: "",
-    licenseNumber: ""
+    areaName: ""
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
-  };
-
-  const generatePassword = () => {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let pass = "";
-    for (let i = 0; i < 8; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
-    setForm(prev => ({ ...prev, password: pass }));
   };
 
   const handleSubmit = (e) => {
@@ -99,20 +90,12 @@ export function AddRiderModal({ onClose, onSubmit, submitting, formError }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-sky-50/30 p-5 rounded-xl border border-sky-100">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-gray-600">Username</label>
-                  <input name="username" value={form.username} onChange={handleChange} required className="w-full px-4 py-2.5 rounded-lg border border-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm shadow-sm" placeholder="Auto-generated or custom" type="text" />
+                  <input name="username" value={form.username} onChange={handleChange} required className="w-full px-4 py-2.5 rounded-lg border border-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm shadow-sm" placeholder="e.g. johndoe" type="text" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-gray-600">Temporary Password</label>
-                  <div className="flex gap-2">
-                    <input name="password" value={form.password} onChange={handleChange} required className="w-full px-4 py-2.5 rounded-lg border border-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm shadow-sm flex-1" type="text" placeholder="Enter or generate..." />
-                    <button type="button" onClick={generatePassword} className="px-4 py-2.5 rounded-lg border border-sky-200 text-sky-600 hover:bg-sky-100 bg-white transition-colors text-sm font-semibold flex items-center gap-2 shadow-sm">
-                      <RefreshCw className="w-4 h-4" /> Generate
-                    </button>
-                  </div>
+                  <label className="text-xs font-semibold text-gray-600">Password</label>
+                  <input name="password" value={form.password} onChange={handleChange} required className="w-full px-4 py-2.5 rounded-lg border border-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm shadow-sm" type="text" placeholder="Enter password" />
                 </div>
-                <p className="md:col-span-2 text-[11px] text-gray-500 flex items-start gap-1">
-                  <span className="text-sky-600">ℹ</span> Credentials will be shared with the rider. They will be prompted to change the password on first login.
-                </p>
               </div>
             </section>
 
@@ -121,28 +104,10 @@ export function AddRiderModal({ onClose, onSubmit, submitting, formError }) {
               <h3 className="text-xs font-bold text-sky-600 uppercase tracking-wider mb-4 flex items-center gap-2">
                 <Briefcase className="w-4 h-4" /> Operational Details
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-gray-600">Shift Timing</label>
-                  <div className="relative">
-                    <select name="shiftTiming" value={form.shiftTiming} onChange={handleChange} className="w-full pl-4 pr-10 py-2.5 appearance-none rounded-lg border border-gray-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm bg-white">
-                      <option value="Morning (06:00 - 14:00)">Morning (06:00 - 14:00)</option>
-                      <option value="Evening (14:00 - 22:00)">Evening (14:00 - 22:00)</option>
-                      <option value="Night (22:00 - 06:00)">Night (22:00 - 06:00)</option>
-                    </select>
-                    <svg className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                  </div>
+                <div className="flex flex-col gap-1.5 md:col-span-2">
+                  <label className="text-xs font-semibold text-gray-600">Area Name / Route</label>
+                  <input name="areaName" value={form.areaName} onChange={handleChange} required className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm" placeholder="e.g. Downtown, Sector 5" type="text" />
                 </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-gray-600">Assigned Vehicle</label>
-                  <input name="assignedVehicle" value={form.assignedVehicle} onChange={handleChange} className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm" placeholder="e.g. Van AF-205" type="text" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-gray-600">License Number</label>
-                  <input name="licenseNumber" value={form.licenseNumber} onChange={handleChange} className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm" placeholder="Driver License No." type="text" />
-                </div>
-              </div>
             </section>
             
           </form>

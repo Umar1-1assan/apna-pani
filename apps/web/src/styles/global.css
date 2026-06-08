@@ -47,6 +47,42 @@ input {
   font: inherit;
 }
 
+/* ─── RTL Safety: Keep all form inputs LTR even in Urdu mode ─── */
+/* This prevents input text from flipping direction which causes confusion */
+input,
+textarea,
+select,
+input::placeholder,
+textarea::placeholder {
+  direction: ltr !important;
+  text-align: left;
+  unicode-bidi: plaintext;
+}
+
+/* Number inputs should always be LTR */
+input[type="number"],
+input[type="tel"],
+input[type="email"],
+input[type="url"],
+input[type="password"] {
+  direction: ltr !important;
+  text-align: left;
+}
+
+/* Center date values in Chrome/Webkit when input has text-center class */
+input[type="date"].text-center::-webkit-date-and-time-value {
+  text-align: center !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+input[type="date"].text-center::-webkit-datetime-edit {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
 .shell {
   min-height: 100vh;
 }
@@ -583,4 +619,21 @@ th {
 .no-scrollbar {
   -ms-overflow-style: none !important; /* IE and Edge */
   scrollbar-width: none !important; /* Firefox */
+}
+
+/* ── Custom Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out both;
+}
+.animate-slideUp {
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
 }

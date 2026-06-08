@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Plus, Edit2, Ban, ChevronLeft, ChevronRight, User, Trash2 } from 'lucide-react';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { ConfirmationModal } from '../ConfirmationModal';
 
-export function CustomerManagement({ customers, riders, onAddCustomer, onUpdateCustomer, onDeleteCustomer, onUpdateStatus }) {
+export function CustomerManagement({ customers, riders, onAddCustomer, onUpdateCustomer, onDeleteCustomer, onUpdateStatus, onAssignRider }) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteCustomerId, setDeleteCustomerId] = useState(null);
@@ -17,6 +17,19 @@ export function CustomerManagement({ customers, riders, onAddCustomer, onUpdateC
     const matchesRider = riderFilter === "all" || (riderFilter === "unassigned" ? !c.deliveryBoyId : c.deliveryBoyId === riderFilter);
     return matchesSearch && matchesStatus && matchesRider;
   });
+
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage) || 1;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, riderFilter]);
+
+  const validCurrentPage = Math.min(currentPage, totalPages);
+  const startIndex = (validCurrentPage - 1) * itemsPerPage;
+  const paginatedCustomers = filteredCustomers.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 animate-fadeIn">
@@ -97,7 +110,7 @@ export function CustomerManagement({ customers, riders, onAddCustomer, onUpdateC
               </tr>
             </thead>
             <tbody className="divide-y divide-[#e2e8f0]">
-              {filteredCustomers.map((c) => {
+              {paginatedCustomers.map((c) => {
                 const initials = (c.userId?.fullName || "A B").split(" ").map(n => n[0]).join("").substring(0,2).toUpperCase();
                 const rider = riders.find(r => r._id === c.deliveryBoyId) || null;
                 const riderInitials = rider ? (rider.userId?.fullName || "R").split(" ").map(n => n[0]).join("").substring(0,2).toUpperCase() : "";
@@ -123,19 +136,31 @@ export function CustomerManagement({ customers, riders, onAddCustomer, onUpdateC
                       <p className="text-gray-600 font-medium max-w-[200px] truncate" title={c.address}>{c.address}</p>
                     </td>
 
-                    <td className="px-6 py-4">
-                      {rider ? (
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-full bg-white shadow-sm">
-                          <div className="w-6 h-6 rounded-full bg-teal-100 text-teal-700 font-bold text-[10px] flex items-center justify-center">
-                            {riderInitials}
+                    <td className="px-6 py-4 relative group">
+                      <div className="relative inline-block">
+                        <select
+                          value={c.deliveryBoyId || ""}
+                          onChange={(e) => onAssignRider && onAssignRider(c._id, e.target.value)}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        >
+                          <option value="">{t('unassigned') || 'Unassigned'}</option>
+                          {riders.map(r => (
+                            <option key={r._id} value={r._id}>{r.userId?.fullName || r.areaName || 'Unnamed Rider'}</option>
+                          ))}
+                        </select>
+                        {rider ? (
+                          <div className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-full bg-white shadow-sm group-hover:border-blue-300 transition-colors">
+                            <div className="w-6 h-6 rounded-full bg-teal-100 text-teal-700 font-bold text-[10px] flex items-center justify-center">
+                              {riderInitials}
+                            </div>
+                            <span className="text-xs font-bold text-gray-700">{rider.userId?.fullName?.split(" ")[0]}</span>
                           </div>
-                          <span className="text-xs font-bold text-gray-700">{rider.userId?.fullName?.split(" ")[0]}</span>
-                        </div>
-                      ) : (
-                        <button className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-dashed border-gray-300 rounded-full bg-gray-50 text-gray-500 hover:text-gray-700 hover:border-gray-400 transition-colors text-xs font-bold">
-                          <Plus className="w-3 h-3" /> {t('assign')}
-                        </button>
-                      )}
+                        ) : (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-dashed border-gray-300 rounded-full bg-gray-50 text-gray-500 group-hover:text-blue-600 group-hover:border-blue-400 transition-colors text-xs font-bold">
+                            <Plus className="w-3 h-3" /> {t('assign')}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-center">
                       <div className="flex flex-col items-center">
@@ -211,25 +236,41 @@ export function CustomerManagement({ customers, riders, onAddCustomer, onUpdateC
         {/* Pagination Footer */}
         <div className="px-6 py-4 border-t border-[#e2e8f0] bg-[#f8fafc] flex justify-between items-center text-sm">
           <span className="text-gray-500 font-medium">
-            {t('showing_entries', { filtered: filteredCustomers.length, total: customers.length })}
+            Showing {filteredCustomers.length > 0 ? startIndex + 1 : 0} to {Math.min(startIndex + itemsPerPage, filteredCustomers.length)} of {filteredCustomers.length} entries
           </span>
-          <div className="flex gap-1">
-            <button className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 text-gray-400 hover:bg-white transition-colors" disabled>
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-md bg-[#0058bf] text-white font-bold shadow-sm transition-colors">
-              1
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-white transition-colors bg-transparent">
-              2
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-white transition-colors bg-transparent">
-              3
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-white transition-colors">
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
+          {totalPages > 1 && (
+            <div className="flex gap-1">
+              <button 
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={validCurrentPage === 1}
+                className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent transition-colors bg-white"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <button 
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`w-8 h-8 flex items-center justify-center rounded-md text-sm transition-colors ${
+                    validCurrentPage === i + 1 
+                      ? "bg-[#0058bf] text-white font-bold shadow-sm" 
+                      : "border border-gray-200 text-gray-600 hover:bg-gray-100 bg-white"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              <button 
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={validCurrentPage === totalPages}
+                className="w-8 h-8 flex items-center justify-center rounded-md border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:hover:bg-transparent transition-colors bg-white"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -7,22 +7,12 @@ export function UpdateRiderModal({ rider, onClose, onUpdate, submitting, formErr
     phone: rider.userId?.phone || "",
     email: rider.userId?.email || "",
     username: rider.userId?.username || "",
-    password: "",
-    shiftTiming: rider.shiftTiming || "Morning (06:00 - 14:00)",
-    assignedVehicle: rider.assignedVehicle || "",
-    licenseNumber: rider.licenseNumber || ""
+    password: ""
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
-  };
-
-  const generatePassword = () => {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let pass = "";
-    for (let i = 0; i < 8; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
-    setForm(prev => ({ ...prev, password: pass }));
   };
 
   const handleSubmit = (e) => {
@@ -104,44 +94,13 @@ export function UpdateRiderModal({ rider, onClose, onUpdate, submitting, formErr
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-semibold text-gray-600">New Password</label>
-                  <div className="flex gap-2">
-                    <input name="password" value={form.password} onChange={handleChange} className="w-full px-4 py-2.5 rounded-lg border border-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm shadow-sm flex-1" type="text" placeholder="Leave blank to keep current" />
-                    <button type="button" onClick={generatePassword} className="px-4 py-2.5 rounded-lg border border-sky-200 text-sky-600 hover:bg-sky-100 bg-white transition-colors text-sm font-semibold flex items-center gap-2 shadow-sm">
-                      <RefreshCw className="w-4 h-4" /> Generate
-                    </button>
-                  </div>
+                  <input name="password" value={form.password} onChange={handleChange} className="w-full px-4 py-2.5 rounded-lg border border-white focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm shadow-sm" type="text" placeholder="Leave blank to keep current" />
                 </div>
               </div>
             </section>
 
             {/* Section 3: Operational Details */}
-            <section>
-              <h3 className="text-xs font-bold text-sky-600 uppercase tracking-wider mb-4 flex items-center gap-2">
-                <Briefcase className="w-4 h-4" /> Operational Details
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-gray-600">Shift Timing</label>
-                  <div className="relative">
-                    <select name="shiftTiming" value={form.shiftTiming} onChange={handleChange} className="w-full pl-4 pr-10 py-2.5 appearance-none rounded-lg border border-gray-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm bg-white">
-                      <option value="Morning (06:00 - 14:00)">Morning (06:00 - 14:00)</option>
-                      <option value="Evening (14:00 - 22:00)">Evening (14:00 - 22:00)</option>
-                      <option value="Night (22:00 - 06:00)">Night (22:00 - 06:00)</option>
-                    </select>
-                    <svg className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-gray-600">Assigned Vehicle</label>
-                  <input name="assignedVehicle" value={form.assignedVehicle} onChange={handleChange} className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm" placeholder="e.g. Van AF-205" type="text" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-gray-600">License Number</label>
-                  <input name="licenseNumber" value={form.licenseNumber} onChange={handleChange} className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all text-sm" placeholder="Driver License No." type="text" />
-                </div>
-              </div>
-            </section>
+            {/* Kept empty or completely removed since areaName is not in UpdateRiderModal? Wait, areaName is not here! Let me check where areaName is. It's missing from UpdateRiderModal entirely. Actually let me just remove Section 3 completely. */}
             
           </form>
         </div>

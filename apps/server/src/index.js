@@ -44,7 +44,7 @@ app.use(cors({
  */
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: process.env.NODE_ENV === 'production' ? 100 : 5000,
   message: 'Too many requests from this IP'
 });
 

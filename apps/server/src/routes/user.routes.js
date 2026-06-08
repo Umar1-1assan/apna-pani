@@ -4,7 +4,7 @@ const {
   listSuppliersHandler,
   getProfileHandler,
   updateProfileHandler
-} = require('../controllers/user.controller');
+} = require('../controllers/users');
 const { authenticate } = require('../middleware/auth.middleware');
 
 /**

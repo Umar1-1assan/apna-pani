@@ -11,7 +11,7 @@ import { CustomerDashboard } from "./customer/CustomerDashboard";
 import { AdminDashboard } from "./admin/AdminDashboard";
 import ProfileModal from "../components/modals/ProfileModal";
 
-import { LayoutDashboard, Settings, Building2, Receipt, Lock, MapPin, Package, LogOut, CalendarDays, Users, Bike, Truck, Plus, Banknote, CreditCard, Layers } from "lucide-react";
+import { LayoutDashboard, Settings, Building2, Receipt, Lock, MapPin, Package, LogOut, CalendarDays, Users, Bike, Truck, Plus, Banknote, CreditCard, Layers, Send } from "lucide-react";
 
 const roleLabel = {
   super_admin: "Super Admin",
@@ -90,8 +90,9 @@ export function DashboardPage() {
       DashboardContent = RiderDashboard;
       navItems = [
         { id: "overview", label: t("overview_cockpit"), icon: <LayoutDashboard size={20} /> },
-        { id: "history", label: t("delivery_history"), icon: <MapPin size={20} /> },
-        { id: "performance", label: t("performance"), icon: <Banknote size={20} /> }
+        { id: "today_route", label: t("rider_nav_today"), icon: <Truck size={20} /> },
+        { id: "history", label: t("rider_nav_history"), icon: <CalendarDays size={20} /> },
+        { id: "cash_management", label: t("rider_nav_cash"), icon: <Banknote size={20} /> }
       ];
       break;
     case "customer":
@@ -111,9 +112,9 @@ export function DashboardPage() {
         { id: "products", label: t("products"), icon: <Package size={20} /> },
         { id: "customers", label: t("customer_mgmt"), icon: <Users size={20} /> },
         { id: "riders", label: t("fleet_status"), icon: <Bike size={20} /> },
-        { id: "routing", label: t("route_map"), icon: <MapPin size={20} /> },
         { id: "deliveries", label: t("deliveries_log"), icon: <Truck size={20} /> },
-        { id: "invoices", label: t("invoices"), icon: <Receipt size={20} /> },
+        { id: "routing", label: t("dispatch"), icon: <Send size={20} /> },
+        { id: "payments", label: t("payments"), icon: <Receipt size={20} /> },
         { id: "subscription", label: t("subscriptions"), icon: <CreditCard size={20} /> }
       ];
       break;
@@ -161,7 +162,7 @@ export function DashboardPage() {
             </div>
             <div className="overflow-hidden flex-1">
               <h4 className="font-bold text-xs text-gray-800 truncate">{displayName}</h4>
-              <p className="text-[10px] text-gray-500 truncate">{user?.phone || 'No Phone'}</p>
+              <p className="text-[10px] text-gray-500 truncate">{user?.phone || t('no_phone')}</p>
             </div>
             <button onClick={handleLogout} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
               <LogOut size={16} />
@@ -172,7 +173,7 @@ export function DashboardPage() {
           {role !== "super_admin" && (
             <button onClick={toggleLanguage} className="mt-2 w-full flex items-center justify-center gap-2 p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition-colors">
               <Settings size={14} />
-              {language === 'en' ? 'اردو میں تبدیل کریں' : 'Switch to English'}
+              {language === 'en' ? t('switch_to_urdu') : t('switch_to_english')}
             </button>
           )}
 
@@ -216,8 +217,8 @@ export function DashboardPage() {
         {/* Workspace Top Header */}
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full px-6 py-6 border-b border-[#eff4ff] bg-white gap-4">
           <div>
-            <h2 className="text-lg font-bold text-gray-800 leading-none">Logistics Console</h2>
-            <p className="text-xs text-gray-400 mt-1.5">Welcome back to the regional hub system cockpit.</p>
+            <h2 className="text-lg font-bold text-gray-800 leading-none">{t('logistics_console')}</h2>
+            <p className="text-xs text-gray-400 mt-1.5">{t('welcome_back_cockpit')}</p>
           </div>
 
           <div className="flex items-center gap-3 self-stretch sm:self-auto justify-between sm:justify-start">

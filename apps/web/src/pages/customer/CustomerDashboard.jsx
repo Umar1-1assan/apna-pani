@@ -3,6 +3,14 @@ import { useEffect, useState } from "react";
 import { api } from "../../api/client";
 import { useTranslation } from "../../contexts/LanguageContext";
 import { useAuthStore } from "../../store/authStore";
+import { toast } from 'react-hot-toast';
+
+const getLocalDateString = (d = new Date()) => {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 export function CustomerDashboard({ activeTab }) {
   const { t, language, toggleLanguage } = useTranslation();
@@ -18,12 +26,11 @@ export function CustomerDashboard({ activeTab }) {
   // Forms
   const [orderForm, setOrderForm] = useState({
     quantity: 1,
-    productType: '19L carboy',
-    deliveryAddress: '',
-    deliveryDate: new Date().toISOString().split('T')[0],
+    deliveryDate: getLocalDateString(),
     timeSlot: 'morning',
-    paymentMethod: 'COD',
-    notes: ''
+    productType: '19L carboy',
+    notes: '',
+    deliveryAddress: ''
   });
 
   const [profileForm, setProfileForm] = useState({
@@ -71,12 +78,12 @@ export function CustomerDashboard({ activeTab }) {
     setSubmitting(true);
     try {
       await api.post('/orders', { ...orderForm, quantity: parseInt(orderForm.quantity) });
-      alert('Order Placed Successfully!');
+      toast.success('Order Placed Successfully!');
       loadData();
       // Reset form quantity/notes
       setOrderForm(prev => ({ ...prev, quantity: 1, notes: '' }));
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to place order');
+      toast.error(err.response?.data?.message || 'Failed to place order');
     } finally {
       setSubmitting(false);
     }
@@ -85,10 +92,10 @@ export function CustomerDashboard({ activeTab }) {
   const handleConfirmReceipt = async (orderId) => {
     try {
       await api.put(`/orders/${orderId}/confirm`);
-      alert('Thank you! Receipt confirmed.');
+      toast.success('Thank you! Receipt confirmed.');
       loadData();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to confirm receipt');
+      toast.error(err.response?.data?.message || 'Failed to confirm receipt');
     }
   };
 
@@ -97,12 +104,22 @@ export function CustomerDashboard({ activeTab }) {
     setSubmitting(true);
     try {
       await api.put('/customers/me', profileForm);
-      alert('Profile Updated Successfully!');
+      toast.success('Profile Updated Successfully!');
       loadData();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update profile');
+      toast.error(err.response?.data?.message || 'Failed to update profile');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleNotifyPaid = async (invoiceId) => {
+    try {
+      await api.put(`/customers/invoices/${invoiceId}/pay`);
+      toast.success('Supplier notified of your payment!');
+      loadData();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to notify payment');
     }
   };
 
@@ -181,16 +198,18 @@ export function CustomerDashboard({ activeTab }) {
           <p className="text-[10px] sm:text-xs text-gray-400 font-medium">Resets on {dashboardStats?.nextInvoiceDate ? new Date(dashboardStats.nextInvoiceDate).toLocaleDateString() : 'Next Cycle'}</p>
         </div>
         
-        {/* Billing Info */}
+        {/* Outstanding Dues */}
         <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-center">
           <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-indigo-50 text-indigo-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0 ${customer?.outstandingDues > 0 ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'}`}>
               <Receipt className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <p className="text-xs sm:text-sm text-gray-500 font-bold uppercase tracking-wider">Billing</p>
+            <p className="text-xs sm:text-sm text-gray-500 font-bold uppercase tracking-wider">Outstanding Dues</p>
           </div>
-          <p className="text-base sm:text-xl font-black text-gray-900 capitalize leading-tight">{dashboardStats?.billingCycle || 'Monthly'}</p>
-          <p className="text-[10px] sm:text-xs text-gray-500 font-medium mt-1">Next: <span className="font-bold text-indigo-600">{dashboardStats?.nextInvoiceDate ? new Date(dashboardStats.nextInvoiceDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Pending'}</span></p>
+          <p className={`text-base sm:text-2xl font-black leading-tight ${customer?.outstandingDues > 0 ? 'text-red-600' : 'text-emerald-600'}`}>₨ {customer?.outstandingDues || 0}</p>
+          <p className="text-[10px] sm:text-xs text-gray-500 font-medium mt-1">
+            {customer?.outstandingDues > 0 ? 'Please clear your dues' : 'All clear!'}
+          </p>
         </div>
 
         {/* Pricing Info */}
@@ -251,7 +270,7 @@ export function CustomerDashboard({ activeTab }) {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="px-4 py-3 sm:px-5 sm:py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
             <h3 className="font-bold text-gray-800 text-sm sm:text-base flex items-center gap-2">
-              <Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500" /> Recent Invoices
+              <Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500" /> Recent Generated Invoices
             </h3>
           </div>
           <div className="divide-y divide-gray-50">
@@ -292,6 +311,17 @@ export function CustomerDashboard({ activeTab }) {
           </div>
           
           <form onSubmit={handleOrderSubmit} className="p-8">
+            
+            {(customer?.outstandingDues > 500) && (
+              <div className="mb-6 bg-red-50 border border-red-200 p-4 rounded-xl flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
+                <div>
+                  <h4 className="font-bold text-red-800 text-sm">Action Required: Outstanding Dues</h4>
+                  <p className="text-red-600 text-xs mt-1">Your outstanding balance has exceeded ₨ 500. Please clear your dues from the Billing tab to continue requesting new deliveries.</p>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-6">
               
               {/* Product Info */}
@@ -323,7 +353,7 @@ export function CustomerDashboard({ activeTab }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-1.5">{t("date")}</label>
-                    <input type="date" value={orderForm.deliveryDate} onChange={e => setOrderForm(p => ({...p, deliveryDate: e.target.value}))} min={new Date().toISOString().split('T')[0]} className="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-medium" required />
+                    <input type="date" value={orderForm.deliveryDate} onChange={e => setOrderForm(p => ({...p, deliveryDate: e.target.value}))} min={getLocalDateString()} className="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-medium" required />
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-1.5">{t("time_slot")}</label>
@@ -352,36 +382,6 @@ export function CustomerDashboard({ activeTab }) {
                   </div>
                 </div>
               </div>
-
-              {/* Payment Method */}
-              <div>
-                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 mt-8">{t("payment")}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <label className={`cursor-pointer border-2 rounded-xl p-4 flex items-center gap-3 transition-all ${orderForm.paymentMethod === 'COD' ? 'border-blue-500 bg-blue-50/50' : 'border-gray-200 hover:border-gray-300'}`}>
-                    <input type="radio" name="payment" value="COD" checked={orderForm.paymentMethod === 'COD'} onChange={() => setOrderForm(p => ({...p, paymentMethod: 'COD'}))} className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <p className="font-bold text-gray-900">{t("cod")}</p>
-                      <p className="text-xs text-gray-500">{t("cod_desc")}</p>
-                    </div>
-                  </label>
-                  
-                  <label className={`cursor-pointer border-2 rounded-xl p-4 flex items-center gap-3 transition-all ${['Easypaisa', 'JazzCash'].includes(orderForm.paymentMethod) ? 'border-blue-500 bg-blue-50/50' : 'border-gray-200 hover:border-gray-300'}`}>
-                    <input type="radio" name="payment" value="Easypaisa" checked={['Easypaisa', 'JazzCash'].includes(orderForm.paymentMethod)} onChange={() => setOrderForm(p => ({...p, paymentMethod: 'Easypaisa'}))} className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <p className="font-bold text-gray-900">{t("online")}</p>
-                      <p className="text-xs text-gray-500">{t("online_desc")}</p>
-                    </div>
-                  </label>
-                </div>
-                
-                {['Easypaisa', 'JazzCash'].includes(orderForm.paymentMethod) && (
-                  <div className="mt-3 bg-orange-50 border border-orange-100 p-3 rounded-xl text-orange-800 text-sm flex gap-2">
-                    <Info className="w-5 h-5 shrink-0" />
-                    <p>The rider will bring a QR code or provide the account number upon arrival for digital payment transfer.</p>
-                  </div>
-                )}
-              </div>
-
             </div>
 
             {/* Total & Submit */}
@@ -391,7 +391,7 @@ export function CustomerDashboard({ activeTab }) {
                 <p className="text-3xl font-black text-blue-600">₨ {totalCalc}</p>
                 <p className="text-xs text-gray-400 font-medium">({orderForm.quantity} x ₨{customer?.bottlePrice})</p>
               </div>
-              <button type="submit" disabled={submitting} className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black text-lg rounded-xl shadow-lg shadow-blue-200 transition-all disabled:opacity-70 flex items-center justify-center gap-2">
+              <button type="submit" disabled={submitting || (customer?.outstandingDues > 500)} className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black text-lg rounded-xl shadow-lg shadow-blue-200 transition-all disabled:opacity-70 disabled:bg-gray-400 disabled:shadow-none flex items-center justify-center gap-2">
                 {submitting ? '...' : t("submit_order_request")} <Check className="w-5 h-5" />
               </button>
             </div>
@@ -475,47 +475,117 @@ export function CustomerDashboard({ activeTab }) {
     </div>
   );
 
-  const renderBilling = () => (
-    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden animate-fadeIn max-w-5xl mx-auto">
-      <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-        <h2 className="text-xl font-bold text-gray-800">{t("billing_and_invoices")}</h2>
-        <p className="text-sm text-gray-500 mt-1">{t("view_receipts")}</p>
-      </div>
-      <div className="p-8">
-        {invoices.length === 0 ? (
-          <div className="text-center py-12 text-gray-400">
-             <Receipt className="w-12 h-12 mx-auto mb-3 text-gray-200" />
-             <p className="font-bold text-gray-600">{t("no_invoices_found")}</p>
+  const renderBilling = () => {
+    // 1. Calculate Unpaid Invoices Total (Arrears)
+    const unpaidTotal = invoices
+      .filter(inv => inv.paymentStatus !== 'paid')
+      .reduce((sum, inv) => sum + (inv.totalAmount - (inv.paidAmount || 0)), 0);
+
+    // 2. Calculate Current Unbilled Deliveries (Accrued Amount)
+    const unbilledOrders = orders.filter(
+      o => (o.status === 'completed' || o.status === 'delivered') && !o.isBilled
+    );
+    const unbilledBottles = unbilledOrders.reduce((sum, o) => sum + o.quantity, 0);
+    const unbilledAmount = unbilledBottles * (customer?.bottlePrice || 150);
+
+    return (
+      <div className="space-y-6 animate-fadeIn max-w-5xl mx-auto">
+        {/* Current Situation Section */}
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Current Payment Situation</h2>
+              <p className="text-sm text-gray-500 mt-1">Overview of your ongoing cycle and pending dues.</p>
+            </div>
+            <div className="flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-xl text-sm font-bold border border-blue-100">
+              <CalendarDays className="w-4 h-4" /> 
+              {customer?.billingCycle ? customer.billingCycle.charAt(0).toUpperCase() + customer.billingCycle.slice(1) : 'Monthly'} Cycle
+            </div>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {invoices.map(inv => (
-              <div key={inv._id} className="border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow relative overflow-hidden group">
-                <div className={`absolute top-0 left-0 w-1.5 h-full ${inv.paymentStatus === 'paid' ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
-                <div className="flex justify-between items-start mb-4 pl-2">
-                  <div>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t("invoice_date")}</p>
-                    <p className="font-bold text-gray-900">{new Date(inv.createdAt || inv.updatedAt).toLocaleDateString()}</p>
-                  </div>
-                  <div className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase ${inv.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>
-                    {inv.paymentStatus}
-                  </div>
-                </div>
-                <div className="pl-2">
-                  <p className="text-sm text-gray-500">{t("amount_due_paid")}</p>
-                  <p className="text-2xl font-black text-gray-900">₨ {inv.totalAmount}</p>
-                  <div className="mt-4 text-xs text-gray-500 bg-gray-50 rounded-lg p-3">
-                    <p className="flex justify-between"><span>{t("bottles")}:</span> <span className="font-bold">{inv.totalBottles}</span></p>
-                    <p className="flex justify-between mt-1"><span>{t("rate")}</span> <span className="font-bold">₨ {inv.bottlePrice}</span></p>
-                  </div>
-                </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Arrears / Unpaid Box */}
+            <div className="bg-red-50 border border-red-100 rounded-2xl p-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <AlertTriangle className="w-24 h-24 text-red-600" />
               </div>
-            ))}
+              <h3 className="text-sm font-bold text-red-600 tracking-wider uppercase mb-2 relative z-10">Outstanding Arrears</h3>
+              <p className="text-4xl font-black text-red-700 relative z-10">₨ {unpaidTotal.toLocaleString()}</p>
+              <p className="text-sm text-red-600/80 mt-2 font-medium relative z-10">From previously generated unpaid invoices.</p>
+            </div>
+
+            {/* Current Accrual Box */}
+            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-10">
+                <Package className="w-24 h-24 text-emerald-600" />
+              </div>
+              <h3 className="text-sm font-bold text-emerald-600 tracking-wider uppercase mb-2 relative z-10">Current Cycle Accrued</h3>
+              <p className="text-4xl font-black text-emerald-700 relative z-10">₨ {unbilledAmount.toLocaleString()}</p>
+              <p className="text-sm text-emerald-600/80 mt-2 font-medium relative z-10">
+                {unbilledBottles} bottles delivered so far this cycle.
+              </p>
+            </div>
           </div>
-        )}
+        </div>
+
+        {/* Payment History / Invoices Section */}
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+            <h2 className="text-xl font-bold text-gray-800">Payment History & Invoices</h2>
+            <p className="text-sm text-gray-500 mt-1">All your formally generated bills.</p>
+          </div>
+          <div className="p-8">
+            {invoices.length === 0 ? (
+              <div className="text-center py-12 text-gray-400">
+                <Receipt className="w-12 h-12 mx-auto mb-3 text-gray-200" />
+                <p className="font-bold text-gray-600">{t("no_invoices_found")}</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {invoices.map(inv => (
+                  <div key={inv._id} className="border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow relative overflow-hidden group">
+                    <div className={`absolute top-0 left-0 w-1.5 h-full ${inv.paymentStatus === 'paid' ? 'bg-emerald-500' : inv.paymentStatus === 'pending_confirmation' ? 'bg-blue-500' : 'bg-red-500'}`}></div>
+                    <div className="flex justify-between items-start mb-4 pl-2">
+                      <div>
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t("invoice_date")}</p>
+                        <p className="font-bold text-gray-900">{new Date(inv.createdAt || inv.updatedAt).toLocaleDateString()}</p>
+                      </div>
+                      <div className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase ${inv.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-700' : inv.paymentStatus === 'pending_confirmation' ? 'bg-blue-50 text-blue-700' : 'bg-red-50 text-red-700'}`}>
+                        {inv.paymentStatus === 'pending_confirmation' ? 'Pending Confirm' : inv.paymentStatus}
+                      </div>
+                    </div>
+                    <div className="pl-2">
+                      <p className="text-sm text-gray-500">{t("amount_due_paid")}</p>
+                      <p className="text-2xl font-black text-gray-900">₨ {inv.totalAmount}</p>
+                      <div className="mt-4 text-xs text-gray-500 bg-gray-50 rounded-lg p-3 mb-4">
+                        <p className="flex justify-between"><span>{t("bottles")}:</span> <span className="font-bold">{inv.totalBottles}</span></p>
+                        <p className="flex justify-between mt-1"><span>{t("rate")}</span> <span className="font-bold">₨ {inv.bottlePrice}</span></p>
+                      </div>
+                      
+                      {inv.paymentStatus !== 'paid' && inv.paymentStatus !== 'pending_confirmation' && (
+                        <button
+                          onClick={() => handleNotifyPaid(inv._id)}
+                          className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-colors shadow-sm"
+                        >
+                          Notify Paid
+                        </button>
+                      )}
+                      
+                      {inv.paymentStatus === 'pending_confirmation' && (
+                        <div className="w-full py-2 bg-blue-50 border border-blue-100 text-blue-600 rounded-xl text-center text-xs font-bold shadow-sm">
+                          Waiting for Supplier
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
 
 

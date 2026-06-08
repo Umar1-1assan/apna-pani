@@ -9,7 +9,7 @@ const {
   loginHandler,
   forgotPasswordHandler,
   resetPasswordHandler
-} = require('../controllers/auth.controller');
+} = require('../controllers/auth');
 
 // Public Auth Routes
 

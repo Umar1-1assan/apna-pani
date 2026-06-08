@@ -59,7 +59,10 @@ const CustomerSchema = new mongoose.Schema({
     enum: ['active', 'paused', 'blocked', 'pending_payment', 'cancelled'],
     default: 'active'
   },
-  walletBalance: {
+  lastInvoiceDate: {
+    type: Date
+  },
+  outstandingDues: {
     type: Number,
     default: 0
   },
