@@ -76,7 +76,6 @@ UserSchema.methods.comparePassword = async function(inputPassword) {
 
 // Indexes — phone unique index already created by unique:true on the field
 UserSchema.index({ role: 1 });
-UserSchema.index({ email: 1 });
 
 const User = mongoose.model('User', UserSchema);
 
