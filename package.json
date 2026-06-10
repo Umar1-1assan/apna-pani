@@ -8,7 +8,10 @@
     "dev": "concurrently -k \"npm run dev --workspace @aquaflow/server\" \"npm run dev --workspace @aquaflow/web\"",
     "dev:server": "npm run dev --workspace @aquaflow/server",
     "dev:web": "npm run dev --workspace @aquaflow/web",
-    "build": "npm run build --workspace @aquaflow/server && npm run build --workspace @aquaflow/web"
+    "build": "npm run build --workspace @aquaflow/server && npm run build --workspace @aquaflow/web",
+    "build:web": "npm run build --workspace @aquaflow/web",
+    "start": "npm run start --workspace @aquaflow/server",
+    "start:server": "npm run start --workspace @aquaflow/server"
   },
   "devDependencies": {
     "concurrently": "^9.0.1"

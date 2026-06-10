@@ -108,7 +108,7 @@ export function SupplierDashboard({ user, activeTab }) {
   // Setup WebSockets
   useEffect(() => {
     if (supplierProfile && supplierProfile._id) {
-      const socket = io("http://localhost:5000", {
+      const socket = io(import.meta.env.VITE_API_URL || "http://localhost:5000", {
         withCredentials: true,
       });
       socketRef.current = socket;
