@@ -1,0 +1,15 @@
+{
+  "appId": "com.aquaflow.app",
+  "appName": "AquaFlow",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https",
+    "hostname": "apnapani.com",
+    "cleartext": true
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}

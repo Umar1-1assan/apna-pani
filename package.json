@@ -10,6 +10,12 @@
     "dev:web": "npm run dev --workspace @aquaflow/web",
     "build": "npm run build --workspace @aquaflow/server && npm run build --workspace @aquaflow/web",
     "build:web": "npm run build --workspace @aquaflow/web",
+    "build:mobile": "npm run build:mobile --workspace @aquaflow/web",
+    "build:mobile:local": "npm run build:mobile:local --workspace @aquaflow/web",
+    "build:mobile:emulator": "npm run build:mobile:emulator --workspace @aquaflow/web",
+    "cap:sync": "npm run cap:sync --workspace @aquaflow/web",
+    "cap:open:android": "npm run cap:open:android --workspace @aquaflow/web",
+    "cap:open:ios": "npm run cap:open:ios --workspace @aquaflow/web",
     "start": "npm run start --workspace @aquaflow/server",
     "start:server": "npm run start --workspace @aquaflow/server"
   },

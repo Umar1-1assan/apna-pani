@@ -79,3 +79,39 @@ The frontend is a Vite + React application located in `apps/web`.
 4. **Verify CORS Settings**:
    - Once your Vercel deployment finishes, copy its production URL.
    - Go back to Render's Environment Settings and update `CORS_ORIGIN` to match your Vercel URL exactly (without the trailing slash).
+
+---
+
+### Step-by-Step Railway Deployment (Alternative)
+
+1. **Deploy to Railway**:
+   - Log in to [Railway](https://railway.app/) and click **New Project** > **Deploy from GitHub repo**.
+   - Select your `apna-pani` repository.
+   - Click **Deploy Now** (this initial deployment might fail or build the wrong directory initially until we configure it).
+
+2. **Configure Root Directory and Builds**:
+   - Click on your newly created service box in the Railway canvas.
+   - Go to the **Settings** tab.
+   - Scroll down to the **General** section and find **Root Directory**. Set it to `apps/server`.
+   - Railway will automatically update and re-trigger a build using the root directory context.
+   - (Optional) Verify that the **Build Command** is set to `npm install` and the **Start Command** is set to `npm start`.
+
+3. **Set Environment Variables**:
+   - Go to the **Variables** tab for the service.
+   - Click **New Variable** or **Raw Editor** and add:
+     - `PORT`: `5000`
+     - `NODE_ENV`: `production`
+     - `MONGODB_URI`: `mongodb://muhammadumarhassan987_db_user:IPJLnyw1HC1FlYH5@ac-eyd7bww-shard-00-00.mye74kw.mongodb.net:27017,ac-eyd7bww-shard-00-01.mye74kw.mongodb.net:27017,ac-eyd7bww-shard-00-02.mye74kw.mongodb.net:27017/apna-pani-db?ssl=true&replicaSet=atlas-13n7js-shard-0&authSource=admin&retryWrites=true&w=majority`
+     - `JWT_SECRET`: `your_secure_random_jwt_secret`
+     - `JWT_REFRESH_SECRET`: `your_secure_random_refresh_token_secret`
+     - `CORS_ORIGIN`: `https://your-frontend-domain.vercel.app` (The Vercel URL you got from deploying the frontend)
+     - `SUPER_ADMIN_PHONE`: `+923001234567`
+     - `SUPER_ADMIN_EMAIL`: `admin@aquaflow.com`
+     - `SUPER_ADMIN_PASSWORD`: `admin123`
+     - `SUPER_ADMIN_NAME`: `Super Admin`
+
+4. **Expose a Public URL**:
+   - Go to the **Settings** tab for the service.
+   - Under the **Environment** section, click **Generate Domain** to get a public URL for your backend (e.g., `https://apna-pani-backend-production.up.railway.app`).
+   - Copy this URL and set it as `VITE_API_URL` in your Vercel environment variables.
+

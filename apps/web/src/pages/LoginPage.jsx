@@ -86,7 +86,19 @@ export function LoginPage() {
 
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid credentials. Please try again.");
+      // Detailed error for debugging mobile connectivity
+      let errorMsg = "";
+      if (err.response) {
+        // Server responded with an error status
+        errorMsg = err.response.data?.message || `Server error (${err.response.status})`;
+      } else if (err.request) {
+        // Request was made but no response received (network issue)
+        errorMsg = `Network error: Cannot reach server. Check if backend is running and accessible from this device. (${err.message})`;
+      } else {
+        // Something else went wrong
+        errorMsg = `Request setup error: ${err.message}`;
+      }
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
