@@ -21,14 +21,7 @@ import { SupplierDispatchBoard } from "../../components/supplier/SupplierDispatc
 import { Bike, Plus, AlertTriangle, Users, Banknote, CheckCircle, Key, Lock, MessageCircle, X, MapPin, Package, RefreshCw, CalendarDays, Receipt, Filter, Truck } from "lucide-react";
 import { useTranslation } from "../../contexts/LanguageContext";
 
-// Water drop SVG icon
-function DropIcon({ size = 20, color = "#1d4ed8" }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z" />
-    </svg>
-  );
-}
+
 
 const statusColors = {
   active: "bg-green-50 text-green-700 border border-green-100",

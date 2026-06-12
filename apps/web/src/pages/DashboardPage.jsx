@@ -20,14 +20,7 @@ const roleLabel = {
   customer: "Customer"
 };
 
-// Water drop SVG icon
-function DropIcon({ size = 28, color = "#0058bf" }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z" />
-    </svg>
-  );
-}
+import { Logo } from "../components/Logo";
 
 export function DashboardPage() {
   const user = useAuthStore((s) => s.user);
@@ -126,9 +119,7 @@ export function DashboardPage() {
       <aside className="hidden md:flex h-screen w-64 fixed left-0 top-0 bg-white border-r border-gray-100 flex-col py-6 z-40 shadow-sm transition-all duration-300">
         {/* Brand container */}
         <div className="px-6 mb-8 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-200">
-            <DropIcon size={22} color="#ffffff" />
-          </div>
+          <Logo size={40} showText={false} />
           <div>
             <h1 className="text-xl font-black text-gray-900 tracking-tight leading-none">AquaFlow</h1>
             <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-1 block">{roleLabel[role] ?? role}</span>
@@ -181,35 +172,46 @@ export function DashboardPage() {
       </aside>
 
       {/* ─── MOBILE BOTTOM NAVIGATION (nav) ─── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center px-3 py-2 bg-white/90 backdrop-blur-md border-t border-[#dce9ff] shadow-[0_-8px_30px_rgba(0,0,0,0.04)] rounded-t-3xl">
-        {navItems.map((item) => {
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`flex items-center gap-1.5 py-1.5 px-2 rounded-full transition-all duration-300 ${
-                isActive 
-                  ? "bg-blue-50 text-blue-600 font-bold px-3" 
-                  : "text-gray-400 hover:text-gray-600"
-              }`}
-            >
-              <span className="shrink-0">{cloneElement(item.icon, { size: 18 })}</span>
-              <span className={`text-[11px] whitespace-nowrap overflow-hidden transition-all duration-300 ${
-                isActive ? "max-w-[100px] opacity-100" : "max-w-0 opacity-0"
-              }`}>
-                {item.label}
-              </span>
-            </button>
-          );
-        })}
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-1.5 py-1.5 px-2 text-red-400 hover:text-red-500 rounded-full transition-all duration-300"
-          title="Logout"
-        >
-          <LogOut size={18} />
-        </button>
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+           style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <div className="flex justify-around items-stretch w-full overflow-x-auto no-scrollbar"
+             style={{ minHeight: '64px' }}>
+          {navItems.map((item) => {
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`flex flex-col items-center justify-center gap-1 min-w-[64px] px-2 py-2 transition-colors duration-200 relative ${
+                  isActive
+                    ? "text-blue-600"
+                    : "text-gray-400 active:text-gray-600"
+                }`}
+              >
+                {/* Active indicator bar */}
+                {isActive && (
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[3px] bg-blue-600 rounded-b-full" />
+                )}
+                <span className={`shrink-0 transition-transform duration-200 ${isActive ? "scale-110" : ""}`}>
+                  {cloneElement(item.icon, { size: 22, strokeWidth: isActive ? 2.5 : 2 })}
+                </span>
+                <span className={`text-[10px] leading-tight whitespace-nowrap ${
+                  isActive ? "font-bold text-blue-600" : "font-medium text-gray-400"
+                }`}>
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
+          {/* Logout button */}
+          <button
+            onClick={handleLogout}
+            className="flex flex-col items-center justify-center gap-1 min-w-[64px] px-2 py-2 text-gray-400 active:text-red-500 transition-colors duration-200"
+          >
+            <LogOut size={22} strokeWidth={2} />
+            <span className="text-[10px] leading-tight font-medium whitespace-nowrap">Logout</span>
+          </button>
+        </div>
       </nav>
 
       {/* ─── MAIN CONTENT WORKSPACE (main) ─── */}

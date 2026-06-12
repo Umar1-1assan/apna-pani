@@ -80,9 +80,9 @@ export function ProductManagement() {
 
   const handleToggleAvailable = async (product) => {
     const originalState = product.isAvailable;
-    
+
     // Optimistic UI update
-    setProducts(prev => 
+    setProducts(prev =>
       prev.map(p => p._id === product._id ? { ...p, isAvailable: !originalState } : p)
     );
 
@@ -90,14 +90,14 @@ export function ProductManagement() {
       await api.patch(`/suppliers/products/${product._id}/toggle`);
     } catch (err) {
       // Revert if API call fails
-      setProducts(prev => 
+      setProducts(prev =>
         prev.map(p => p._id === product._id ? { ...p, isAvailable: originalState } : p)
       );
       alert("Failed to toggle product status. Reverting changes.");
     }
   };
 
-  const filteredProducts = products.filter(p => 
+  const filteredProducts = products.filter(p =>
     p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -114,20 +114,20 @@ export function ProductManagement() {
           <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{t('product_mgmt')}</h1>
           <p className="text-sm text-gray-500 mt-1">Add, update, and manage the availability of products in your regional catalog.</p>
         </div>
-        
+
         <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
           <div className="relative w-full sm:w-64">
-            <input 
-              type="text" 
-              placeholder="Search products..." 
+            <input
+              type="text"
+              placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
             />
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
           </div>
-          
-          <button 
+
+          <button
             onClick={() => { setFormError(""); setShowAddModal(true); }}
             className="flex items-center justify-center gap-2 px-5 py-2 bg-[#0058bf] hover:bg-[#004a9f] text-white rounded-lg text-sm font-bold shadow-md shadow-blue-200 transition-transform active:scale-95 whitespace-nowrap"
           >
@@ -188,13 +188,12 @@ export function ProductManagement() {
       {!loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <div 
-              key={product._id} 
-              className={`bg-white rounded-xl border transition-all duration-300 flex flex-col hover:translate-y-[-4px] ${
-                product.isAvailable 
-                  ? 'border-gray-200 shadow-sm hover:shadow-lg' 
+            <div
+              key={product._id}
+              className={`bg-white rounded-xl border transition-all duration-300 flex flex-col hover:translate-y-[-4px] ${product.isAvailable
+                  ? 'border-gray-200 shadow-sm hover:shadow-lg'
                   : 'border-red-100 bg-red-50/10 shadow-sm opacity-90'
-              }`}
+                }`}
             >
               <div className="p-5 flex-1 flex flex-col">
                 {/* Product Header details */}
@@ -202,16 +201,14 @@ export function ProductManagement() {
                   <div>
                     <h3 className="text-lg font-extrabold text-gray-900 leading-tight">{product.name}</h3>
                     <div className="flex items-center gap-1.5 mt-2 bg-blue-50 text-blue-800 font-black text-base px-2.5 py-1 rounded-lg border border-blue-100 shadow-sm w-fit">
-                      <DollarSign className="w-4 h-4 text-blue-600 shrink-0" />
                       <span>₨ {product.price}</span>
                     </div>
                   </div>
 
-                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border shadow-sm shrink-0 ${
-                    product.isAvailable 
-                      ? "bg-emerald-50 text-emerald-700 border-emerald-100" 
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border shadow-sm shrink-0 ${product.isAvailable
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-100"
                       : "bg-red-50 text-red-600 border-red-100"
-                  }`}>
+                    }`}>
                     {product.isAvailable ? t("available") : t("unavailable")}
                   </span>
                 </div>
@@ -226,17 +223,17 @@ export function ProductManagement() {
                   <div className="flex items-center gap-3">
                     <span className="text-xs font-bold text-gray-600 uppercase tracking-wider">{t("availability")}</span>
                     <label className="relative inline-flex items-center cursor-pointer">
-                      <input 
-                        type="checkbox" 
-                        checked={product.isAvailable} 
-                        onChange={() => handleToggleAvailable(product)} 
-                        className="sr-only peer" 
+                      <input
+                        type="checkbox"
+                        checked={product.isAvailable}
+                        onChange={() => handleToggleAvailable(product)}
+                        className="sr-only peer"
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                     </label>
                   </div>
 
-                  <button 
+                  <button
                     onClick={() => { setSelectedProduct(product); setFormError(""); setShowUpdateModal(true); }}
                     className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors border border-blue-100 shadow-sm"
                     title="Edit Product"
@@ -260,7 +257,7 @@ export function ProductManagement() {
 
       {/* Add Modal */}
       {showAddModal && (
-        <AddProductModal 
+        <AddProductModal
           onClose={() => setShowAddModal(false)}
           onSubmit={handleAddSubmit}
           submitting={submitting}
@@ -270,7 +267,7 @@ export function ProductManagement() {
 
       {/* Update Modal */}
       {showUpdateModal && selectedProduct && (
-        <UpdateProductModal 
+        <UpdateProductModal
           product={selectedProduct}
           onClose={() => setShowUpdateModal(false)}
           onUpdate={handleUpdateSubmit}

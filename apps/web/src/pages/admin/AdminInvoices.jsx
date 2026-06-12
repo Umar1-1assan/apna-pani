@@ -22,9 +22,9 @@ export function AdminInvoices({ invoices, suppliers, loadInvoices }) {
     const s = suppliers.find(sup => sup._id === supplierId);
     let amount = 0;
     if (s) {
-      if (s.plan === 'enterprise') amount = 2499;
-      else if (s.plan === 'standard') amount = 129;
-      else amount = 49;
+      if (s.plan === 'enterprise') amount = 15000;
+      else if (s.plan === 'standard') amount = 7500;
+      else amount = 0;
     }
     setFormData(prev => ({ ...prev, supplierId, amount }));
   };
@@ -98,7 +98,7 @@ export function AdminInvoices({ invoices, suppliers, loadInvoices }) {
         <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-between">
           <div>
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Revenue</p>
-            <p className="text-3xl font-black text-gray-900">${totalRevenue.toLocaleString()}</p>
+            <p className="text-3xl font-black text-gray-900">Rs {totalRevenue.toLocaleString()}</p>
           </div>
           <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 shadow-inner">
             <Banknote className="w-6 h-6" />
@@ -201,7 +201,7 @@ export function AdminInvoices({ invoices, suppliers, loadInvoices }) {
                   <td className="px-6 py-4 text-gray-500 text-xs">
                     {new Date(inv.billingPeriodStart).toLocaleDateString()} - {new Date(inv.billingPeriodEnd).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 font-bold text-gray-800">${inv.amount.toLocaleString()}</td>
+                  <td className="px-6 py-4 font-bold text-gray-800">Rs {inv.amount.toLocaleString()}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
                       inv.status === 'paid' ? 'bg-green-50 text-green-700 border border-green-100' :
@@ -280,7 +280,7 @@ export function AdminInvoices({ invoices, suppliers, loadInvoices }) {
                   <input type="text" readOnly value={formData.invoiceNumber} className="w-full px-3 py-2.5 border-2 border-gray-200 bg-gray-50 rounded-xl text-sm outline-none" />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1">Amount ($)</label>
+                  <label className="block text-xs font-semibold text-gray-600 mb-1">Amount (PKR)</label>
                   <input type="number" required value={formData.amount} onChange={e => setFormData({...formData, amount: Number(e.target.value)})} className="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl text-sm outline-none focus:border-blue-500" />
                 </div>
                 <div className="pt-4 flex gap-2">
@@ -309,11 +309,11 @@ export function AdminInvoices({ invoices, suppliers, loadInvoices }) {
                 </div>
                 <div className="border-t border-b border-gray-100 py-4 mb-8 flex justify-between">
                   <p className="text-sm font-semibold text-gray-600">Platform Subscription</p>
-                  <p className="text-sm font-bold text-gray-800">${formData.amount || 0}</p>
+                  <p className="text-sm font-bold text-gray-800">Rs {formData.amount || 0}</p>
                 </div>
                 <div className="flex justify-between text-lg font-bold text-gray-800">
                   <p>Total Due</p>
-                  <p>${formData.amount || 0}</p>
+                  <p>Rs {formData.amount || 0}</p>
                 </div>
               </div>
             </div>

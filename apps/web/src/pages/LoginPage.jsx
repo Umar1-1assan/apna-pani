@@ -3,14 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuthStore } from "../store/authStore";
 
-// Water drop SVG icon
-function DropIcon({ size = 40, color = "#1d4ed8" }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z" />
-    </svg>
-  );
-}
+import { Logo } from "../components/Logo";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -70,7 +63,7 @@ export function LoginPage() {
     try {
       const res = await api.post("/auth/login", { identifier, password });
       const data = res.data.data;
-      
+
       login({
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,
@@ -118,12 +111,12 @@ export function LoginPage() {
 
     try {
       const res = await api.post("/auth/forgot-password", { email: resetEmail });
-      
+
       // Store the generated debug code so the developer can see it or auto-fill it for demo
       const debugCode = res.data.data?.debugCode;
-      
+
       setSuccessMsg(`Verification code sent to email. ${debugCode ? `(Testing code: ${debugCode})` : ""}`);
-      
+
       // Wait a bit to transition
       setTimeout(() => {
         changeViewState("reset");
@@ -165,7 +158,7 @@ export function LoginPage() {
       });
 
       setSuccessMsg("Password updated successfully! Transitioning to login...");
-      
+
       setTimeout(() => {
         changeViewState("login");
         // Reset forms
@@ -186,10 +179,10 @@ export function LoginPage() {
       {/* Animated wave background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <svg className="absolute bottom-0 left-0 w-full" style={{ animation: "wave 8s linear infinite" }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
-          <path fill="rgba(59,130,246,0.08)" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,170.7C960,160,1056,192,1152,197.3C1248,203,1344,181,1392,170.7L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"/>
+          <path fill="rgba(59,130,246,0.08)" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,170.7C960,160,1056,192,1152,197.3C1248,203,1344,181,1392,170.7L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" />
         </svg>
         <svg className="absolute bottom-0 left-0 w-full" style={{ animation: "wave 12s linear infinite reverse" }} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
-          <path fill="rgba(99,102,241,0.06)" d="M0,160L60,170.7C120,181,240,203,360,202.7C480,203,600,181,720,176C840,171,960,181,1080,186.7C1200,192,1320,192,1380,192L1440,192L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"/>
+          <path fill="rgba(99,102,241,0.06)" d="M0,160L60,170.7C120,181,240,203,360,202.7C480,203,600,181,720,176C840,171,960,181,1080,186.7C1200,192,1320,192,1380,192L1440,192L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z" />
         </svg>
         {/* Floating orbs */}
         <div className="absolute top-20 left-10 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-40" style={{ animation: "float 6s ease-in-out infinite" }} />
@@ -211,14 +204,11 @@ export function LoginPage() {
       {/* Main Credentials Card */}
       <div className="relative z-10 w-full max-w-md mx-4 my-8">
         <div className="bg-white rounded-3xl shadow-2xl shadow-blue-100/50 overflow-hidden border border-white/50 backdrop-blur-sm">
-          
+
           {/* Circular Logo & Header */}
-          <div className="px-8 pt-8 pb-5 text-center border-b border-gray-100 bg-gradient-to-b from-blue-50/50 to-white">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4 shadow-lg shadow-blue-200">
-              <DropIcon size={32} color="white" />
-            </div>
-            <h1 className="text-2xl font-bold text-blue-700 tracking-tight">AquaFlow</h1>
-            <p className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mt-1.5">
+          <div className="px-8 pt-8 pb-5 text-center border-b border-gray-100 bg-gradient-to-b from-blue-50/50 to-white flex flex-col items-center">
+            <Logo size={170} showText={false} className="-mt-5 -mb-3" />
+            <p className="text-[10px] font-extrabold text-gray-400 uppercase tracking-widest mt-0">
               {viewState === "login" && "Secure Access Portal"}
               {viewState === "forgot" && "Reset Password"}
               {viewState === "reset" && "Verify & Reset"}

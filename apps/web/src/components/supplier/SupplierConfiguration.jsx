@@ -152,7 +152,7 @@ export function SupplierConfiguration({ profileData, onSave }) {
               <div className="w-full p-6 bg-[#f8fafc] border border-[#e2e8f0] rounded-2xl mb-6">
                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2">{t('default_price')}</p>
                 <div className="flex items-center justify-center text-5xl font-black text-gray-900">
-                  <span className="text-3xl text-gray-400 mr-1">$</span>
+                  <span className="text-3xl text-gray-400 mr-1">Rs</span>
                   <input 
                     type="number" 
                     value={pricing} 

@@ -58,8 +58,8 @@ export function AdminSubscriptions() {
     // Pre-fill amount based on requested plan, unless it's a downgrade
     let amt = 0;
     if (!isDowngrade) {
-      if (req.requestedPlan === 'standard') amt = 2500;
-      if (req.requestedPlan === 'enterprise') amt = 5000;
+      if (req.requestedPlan === 'standard') amt = 7500;
+      if (req.requestedPlan === 'enterprise') amt = 15000;
     }
 
     setApproveModal({
@@ -387,7 +387,7 @@ export function AdminSubscriptions() {
               <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 mt-2">
                 {approveModal.isDowngrade ? (
                   <p className="text-xs text-blue-700 font-medium">
-                    <span className="font-bold">Note: This is a downgrade.</span> The amount has defaulted to 0. A $0 invoice will be ignored, but the supplier's plan limits will update instantly.
+                    <span className="font-bold">Note: This is a downgrade.</span> The amount has defaulted to 0. A Rs 0 invoice will be ignored, but the supplier's plan limits will update instantly.
                   </p>
                 ) : (
                   <p className="text-xs text-blue-700 font-medium">

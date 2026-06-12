@@ -6,14 +6,7 @@ import { ConfirmationModal } from "../../components/ConfirmationModal";
 import { AdminInvoices } from "./AdminInvoices";
 import { AdminSubscriptions } from "./AdminSubscriptions";
 
-// Water drop SVG icon
-function DropIcon({ size = 20, color = "#1d4ed8" }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color} xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2C12 2 5 10.5 5 15a7 7 0 0 0 14 0C19 10.5 12 2 12 2Z" />
-    </svg>
-  );
-}
+import { Logo } from "../../components/Logo";
 
 function AdminSettings({ user }) {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -25,8 +18,8 @@ function AdminSettings({ user }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-       setMsg({ text: "Passwords do not match", type: "error" });
-       return;
+      setMsg({ text: "Passwords do not match", type: "error" });
+      return;
     }
     setLoading(true);
     setMsg({ text: "", type: "" });
@@ -53,47 +46,47 @@ function AdminSettings({ user }) {
             <Settings className="w-5 h-5" /> Super Admin Settings
           </h2>
           <div className="flex gap-4">
-            <button 
-              onClick={() => setActiveSubTab("general")} 
+            <button
+              onClick={() => setActiveSubTab("general")}
               className={`pb-2 text-sm font-semibold border-b-2 transition-colors ${activeSubTab === "general" ? "border-blue-600 text-blue-600" : "border-transparent text-gray-400 hover:text-gray-600"}`}
             >
               General Settings
             </button>
-            <button 
-              onClick={() => setActiveSubTab("pricing")} 
+            <button
+              onClick={() => setActiveSubTab("pricing")}
               className={`pb-2 text-sm font-semibold border-b-2 transition-colors ${activeSubTab === "pricing" ? "border-blue-600 text-blue-600" : "border-transparent text-gray-400 hover:text-gray-600"}`}
             >
               Pricing & Packages
             </button>
           </div>
         </div>
-        
+
         {activeSubTab === "general" ? (
           <div className="p-8 max-w-2xl">
             <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
               <Lock className="w-5 h-5" /> Security Settings
             </h3>
-        {msg.text && (
-          <div className={`mb-6 p-4 rounded-xl text-sm ${msg.type === "error" ? "bg-red-50 text-red-700 border border-red-100" : "bg-green-50 text-green-700 border border-green-100"}`}>
-            {msg.text}
-          </div>
-        )}
-        <form onSubmit={handleSubmit} className="space-y-5">
-           <div>
-             <label className="block text-sm font-semibold text-gray-600 mb-1">Current Password</label>
-             <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" />
-           </div>
-           <div>
-             <label className="block text-sm font-semibold text-gray-600 mb-1">New Password</label>
-             <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" minLength={6} />
-           </div>
-           <div>
-             <label className="block text-sm font-semibold text-gray-600 mb-1">Confirm New Password</label>
-             <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" minLength={6} />
-           </div>
-           <button disabled={loading} type="submit" className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition-all">
-             {loading ? "Updating..." : "Update Password"}
-           </button>
+            {msg.text && (
+              <div className={`mb-6 p-4 rounded-xl text-sm ${msg.type === "error" ? "bg-red-50 text-red-700 border border-red-100" : "bg-green-50 text-green-700 border border-green-100"}`}>
+                {msg.text}
+              </div>
+            )}
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-1">Current Password</label>
+                <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-1">New Password</label>
+                <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" minLength={6} />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-600 mb-1">Confirm New Password</label>
+                <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none" minLength={6} />
+              </div>
+              <button disabled={loading} type="submit" className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition-all">
+                {loading ? "Updating..." : "Update Password"}
+              </button>
             </form>
           </div>
         ) : (
@@ -105,41 +98,41 @@ function AdminSettings({ user }) {
               </div>
               <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md text-sm transition-all">+ Create New Plan</button>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Basic Plan */}
               <div className="border border-gray-200 rounded-3xl p-6 hover:shadow-lg transition-shadow">
                 <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-1 rounded-full">Starter</span>
-                <h4 className="text-2xl font-bold mt-4">Basic</h4>
+                <h4 className="text-2xl font-bold mt-4">Basic Plan</h4>
                 <div className="flex items-end gap-1 my-2">
-                  <span className="text-4xl font-extrabold text-gray-800">$49</span><span className="text-gray-400 font-semibold mb-1">/mo</span>
+                  <span className="text-4xl font-extrabold text-gray-800">Free</span>
                 </div>
-                <p className="text-sm text-gray-500 mb-6">Essential tools for small delivery operations.</p>
+                <p className="text-sm text-gray-500 mb-6">Perfect for small local suppliers starting to digitize.</p>
                 <ul className="space-y-3 mb-8 text-sm text-gray-600 font-medium">
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-500 inline-block" /> Up to 3 Riders</li>
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-500 inline-block" /> Basic Route Optimization</li>
-                  <li className="flex items-center gap-2 text-gray-400"><X className="w-4 h-4 text-gray-400 inline-block" /> Standard Support</li>
-                  <li className="flex items-center gap-2 text-gray-400"><X className="w-4 h-4 text-gray-400 inline-block" /> Advanced Reporting</li>
-                  <li className="flex items-center gap-2 text-gray-400"><X className="w-4 h-4 text-gray-400 inline-block" /> WhatsApp Integration</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-500 inline-block" /> 20 Active Customers</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-500 inline-block" /> 3 Riders</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-500 inline-block" /> Standard Email Support</li>
+                  <li className="flex items-center gap-2 text-gray-400"><X className="w-4 h-4 text-gray-400 inline-block" /> Analytics Reports</li>
+                  <li className="flex items-center gap-2 text-gray-400"><X className="w-4 h-4 text-gray-400 inline-block" /> Priority Email & Chat Support</li>
                 </ul>
                 <button className="w-full py-3 border-2 border-blue-100 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-colors">Edit Plan</button>
               </div>
 
               {/* Standard/Premium Plan */}
               <div className="border-2 border-blue-600 rounded-3xl p-6 shadow-xl relative transform scale-105 bg-white z-10">
-                <div className="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl rounded-tr-3xl uppercase tracking-widest">Most Popular</div>
+                <div className="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl rounded-tr-3xl uppercase tracking-widest">Recommended</div>
                 <span className="text-xs font-bold text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-1 rounded-full">Growth</span>
-                <h4 className="text-2xl font-bold mt-4 text-blue-900">Standard</h4>
+                <h4 className="text-2xl font-bold mt-4 text-blue-900">Standard Plan</h4>
                 <div className="flex items-end gap-1 my-2">
-                  <span className="text-4xl font-extrabold text-blue-900">$129</span><span className="text-blue-400 font-semibold mb-1">/mo</span>
+                  <span className="text-4xl font-extrabold text-blue-900">Rs 7,500</span><span className="text-blue-400 font-semibold mb-1">/mo</span>
                 </div>
-                <p className="text-sm text-gray-500 mb-6">Advanced features for growing delivery fleets.</p>
+                <p className="text-sm text-gray-500 mb-6">Ideal for established water delivery businesses with multiple riders.</p>
                 <ul className="space-y-3 mb-8 text-sm text-gray-700 font-medium">
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 inline-block" /> Up to 10 Riders</li>
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 inline-block" /> Advanced Route Optimization</li>
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 inline-block" /> Priority Support</li>
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 inline-block" /> Advanced Reporting</li>
-                  <li className="flex items-center gap-2 text-gray-400"><X className="w-4 h-4 text-gray-400 inline-block" /> WhatsApp Integration</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 inline-block" /> 200 Active Customers</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 inline-block" /> 10 Riders</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 inline-block" /> Analytics & billing reports</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-600 inline-block" /> Priority Email & Chat Support</li>
+                  <li className="flex items-center gap-2 text-gray-400"><X className="w-4 h-4 text-gray-400 inline-block" /> Custom Branding & Domain</li>
                 </ul>
                 <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition-colors">Edit Plan</button>
               </div>
@@ -147,17 +140,17 @@ function AdminSettings({ user }) {
               {/* Enterprise Plan */}
               <div className="border border-gray-200 rounded-3xl p-6 hover:shadow-lg transition-shadow">
                 <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-1 rounded-full">Scale</span>
-                <h4 className="text-2xl font-bold mt-4">Enterprise</h4>
+                <h4 className="text-2xl font-bold mt-4">Enterprise Plan</h4>
                 <div className="flex items-end gap-1 my-2">
-                  <span className="text-4xl font-extrabold text-gray-800">$299</span><span className="text-gray-400 font-semibold mb-1">/mo</span>
+                  <span className="text-4xl font-extrabold text-gray-800">Rs 15,000</span><span className="text-gray-400 font-semibold mb-1">/mo</span>
                 </div>
-                <p className="text-sm text-gray-500 mb-6">Custom solutions for large-scale operations.</p>
+                <p className="text-sm text-gray-500 mb-6">For large-scale water networks, regional distributors, and municipalities.</p>
                 <ul className="space-y-3 mb-8 text-sm text-gray-600 font-medium">
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-500 inline-block" /> Unlimited Customers</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-500 inline-block" /> Unlimited Riders</li>
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-500 inline-block" /> Dynamic Re-routing</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-500 inline-block" /> Custom Branding & Domain</li>
                   <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-500 inline-block" /> 24/7 Dedicated Support</li>
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-500 inline-block" /> Custom Analytics Dashboards</li>
-                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-500 inline-block" /> WhatsApp Integration</li>
+                  <li className="flex items-center gap-2"><Check className="w-4 h-4 text-blue-500 inline-block" /> WhatsApp & SMS Notifications</li>
                 </ul>
                 <button className="w-full py-3 border-2 border-blue-100 text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-colors">Edit Plan</button>
               </div>
@@ -175,14 +168,14 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [invoices, setInvoices] = useState([]);
-  
+
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
     supplierId: null,
     currentStatus: false,
     loading: false
   });
-  
+
   const [formData, setFormData] = useState({
     businessName: "",
     taxId: "",
@@ -201,7 +194,7 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
     plan: "basic",
     isActive: true
   });
-  
+
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sendEmailToggle, setSendEmailToggle] = useState(true);
@@ -283,7 +276,7 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
   async function handleCreateSupplier(e) {
     e.preventDefault();
     setFormError("");
-    
+
     // Strict validations
     if (!formData.businessName || !formData.fullName || !formData.phone || !formData.address) {
       setFormError("Please fill in all required fields (marked with *)");
@@ -372,7 +365,7 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-              <DropIcon size={24} color="#3b82f6" /> Super Admin Overview
+              <Logo size={24} showText={false} /> Super Admin Overview
             </h1>
             <p className="text-sm text-gray-500 mt-1">Platform wide statistics and revenue tracking.</p>
           </div>
@@ -388,7 +381,7 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
           <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-3xl p-6 text-white shadow-xl shadow-blue-500/10 flex flex-col justify-between hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
             <div>
               <p className="text-blue-100 text-xs font-bold mb-2 uppercase tracking-wider">Total Revenue</p>
-              <h3 className="text-4xl font-black">${totalRevenue.toLocaleString()}</h3>
+              <h3 className="text-4xl font-black"><span className='text-sm'>PKR </span>{totalRevenue.toLocaleString()}</h3>
             </div>
             <div className="mt-6 flex items-center gap-2 text-sm text-blue-100 font-semibold bg-white/10 py-1.5 px-3 rounded-xl w-fit">
               <CreditCard className="w-4 h-4" /> <span>Paid Invoices</span>
@@ -409,7 +402,7 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2.5">
-            <DropIcon size={24} color="#3b82f6" /> Water Supplier Management
+            <Logo size={24} showText={false} /> Water Supplier Management
           </h1>
           <p className="text-sm text-gray-500 mt-1">Configure global suppliers and monitor their tenants.</p>
         </div>
@@ -478,12 +471,12 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
                       <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-2xl space-y-1.5 w-[200px]">
                         <p className="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
                           <Key className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                          <span>User:</span> 
+                          <span>User:</span>
                           <span className="font-mono text-blue-600 font-bold select-all truncate ml-auto">{s.userId?.username || "—"}</span>
                         </p>
                         <p className="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
                           <Lock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                          <span>Pass:</span> 
+                          <span>Pass:</span>
                           <span className="font-mono text-gray-700 bg-white px-1.5 py-0.5 rounded border border-gray-100 font-bold select-all ml-auto">{s.userId?.passwordText || "—"}</span>
                         </p>
                       </div>
@@ -495,14 +488,13 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <select 
+                      <select
                         value={s.plan}
                         onChange={(e) => handlePlanChange(s._id, e.target.value)}
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-lg uppercase tracking-wider outline-none cursor-pointer ${
-                          s.plan === "enterprise" ? "bg-purple-50 text-purple-700 border border-purple-200" :
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-lg uppercase tracking-wider outline-none cursor-pointer ${s.plan === "enterprise" ? "bg-purple-50 text-purple-700 border border-purple-200" :
                           s.plan === "standard" ? "bg-blue-50 text-blue-700 border border-blue-200" :
-                          "bg-gray-50 text-gray-600 border border-gray-200"
-                        }`}
+                            "bg-gray-50 text-gray-600 border border-gray-200"
+                          }`}
                       >
                         <option value="basic">BASIC</option>
                         <option value="standard">STANDARD</option>
@@ -516,11 +508,10 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <button 
+                      <button
                         onClick={() => requestToggleStatus(s._id, s.isActive)}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold hover:shadow-sm transition-all cursor-pointer ${
-                          s.isActive ? "bg-green-50 text-green-700 border border-green-100 hover:bg-green-100" : "bg-red-50 text-red-700 border border-red-100 hover:bg-red-100"
-                        }`}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold hover:shadow-sm transition-all cursor-pointer ${s.isActive ? "bg-green-50 text-green-700 border border-green-100 hover:bg-green-100" : "bg-red-50 text-red-700 border border-red-100 hover:bg-red-100"
+                          }`}
                       >
                         <span className={`w-1.5 h-1.5 rounded-full ${s.isActive ? "bg-green-500" : "bg-red-500"}`} />
                         {s.isActive ? "Active" : "Inactive"}
@@ -538,11 +529,11 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
       {showModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm animate-fadeIn">
           <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-            
+
             {/* Header */}
             <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-blue-50/50 to-white select-none">
               <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
-                <DropIcon size={20} color="#1d4ed8" /> Add New Water Supplier
+                <Logo size={20} showText={false} /> Add New Water Supplier
               </h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -796,7 +787,7 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
 
             {/* Footer / Buttons */}
             <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex justify-between items-center select-none">
-              
+
               {/* Send email credentials toggle */}
               <label className="flex items-center gap-2 cursor-pointer">
                 <input

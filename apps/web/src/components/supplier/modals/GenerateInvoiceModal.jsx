@@ -106,12 +106,12 @@ export function GenerateInvoiceModal({ customers, onClose, onGenerate, submittin
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center">
-                            <span className="text-gray-400 mr-1">$</span>
+                            <span className="text-gray-400 mr-1">Rs</span>
                             <input type="number" value={item.unitPrice} onChange={(e) => handleLineItemChange(item.id, 'unitPrice', Number(e.target.value))} className="w-full bg-transparent outline-none text-gray-600" min="0" step="0.01" />
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right font-bold text-gray-800">
-                          ${(item.qty * item.unitPrice).toFixed(2)}
+                          Rs {(item.qty * item.unitPrice).toFixed(2)}
                         </td>
                       </tr>
                     ))}
@@ -138,15 +138,15 @@ export function GenerateInvoiceModal({ customers, onClose, onGenerate, submittin
               <div className="bg-white border border-gray-200 rounded-lg p-4 w-full md:w-64">
                 <div className="flex justify-between mb-2">
                   <span className="text-sm text-gray-500 font-semibold">Subtotal</span>
-                  <span className="text-sm text-gray-800 font-bold">${subtotal.toFixed(2)}</span>
+                  <span className="text-sm text-gray-800 font-bold">Rs {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between mb-3">
                   <span className="text-sm text-gray-500 font-semibold">Tax (10%)</span>
-                  <span className="text-sm text-gray-800 font-bold">${tax.toFixed(2)}</span>
+                  <span className="text-sm text-gray-800 font-bold">Rs {tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between border-t border-gray-200 pt-3">
                   <span className="text-base text-gray-800 font-bold">Total</span>
-                  <span className="text-lg text-blue-600 font-black">${total.toFixed(2)}</span>
+                  <span className="text-lg text-blue-600 font-black">Rs {total.toFixed(2)}</span>
                 </div>
               </div>
             </div>

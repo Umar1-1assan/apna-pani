@@ -101,7 +101,7 @@ export function SupplierSubscription({ user }) {
       id: 'standard',
       name: t('standard_plan'),
       desc: t('standard_desc'),
-      price: '₨ 2,500/mo',
+      price: 'Rs 7,500/mo',
       limits: { riders: 10 },
       color: 'indigo'
     },
@@ -109,7 +109,7 @@ export function SupplierSubscription({ user }) {
       id: 'enterprise',
       name: t('enterprise_plan'),
       desc: t('enterprise_desc'),
-      price: '₨ 5,000/mo',
+      price: 'Rs 15,000/mo',
       limits: { riders: 'unlimited' },
       color: 'violet'
     }

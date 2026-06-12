@@ -65,7 +65,7 @@ const seedPlans = async () => {
         displayName: 'Standard Plan',
         maxCustomers: 200,
         maxRiders: 10,
-        pricePkr: 5000,
+        pricePkr: 7500,
         description: 'For growing water suppliers',
         features: { whatsapp: true, sms: false, reports: true, api: false, gps: true, customBranding: false, support: 'Email & Chat' }
       },
@@ -87,9 +87,10 @@ const seedPlans = async () => {
         await plan.save();
         console.log(`✓ Seeded ${planData.name} plan`);
       } else {
-        // Update existing plan with new limits if needed
+        // Update existing plan with new limits and price if needed
         existingPlan.maxCustomers = planData.maxCustomers;
         existingPlan.maxRiders = planData.maxRiders;
+        existingPlan.pricePkr = planData.pricePkr;
         await existingPlan.save();
       }
     }

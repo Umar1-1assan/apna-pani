@@ -123,8 +123,8 @@ export function SupplierOverview({ customers, riders, orders, supplierProfile })
             <div>
               <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">{t('todays_revenue')}</p>
               <h3 className="text-3xl font-black text-gray-900">
-                <span className="text-xl text-gray-400 font-bold mr-1">$</span>
-                {(totalRevenueCollected || 0).toFixed(2)}
+                <span className="text-xl text-gray-400 font-bold mr-1">Rs</span>
+                {(totalRevenueCollected || 0).toLocaleString()}
               </h3>
             </div>
           </div>
@@ -227,7 +227,7 @@ export function SupplierOverview({ customers, riders, orders, supplierProfile })
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={v => `$${v}`} />
+                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={v => `Rs ${v}`} />
                 <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
                 <Tooltip 
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
