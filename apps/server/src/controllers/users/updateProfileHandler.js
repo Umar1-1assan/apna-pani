@@ -57,11 +57,12 @@ const updateProfileHandler = asyncHandler(async (req, res) => {
   }
 
   if (password) {
-    if (password.length < 6) {
-      return badRequest(res, 'Password must be at least 6 characters');
+    const { validatePassword } = require('../../utils/passwordValidator');
+    const passValidation = validatePassword(password);
+    if (!passValidation.valid) {
+      return badRequest(res, passValidation.message);
     }
     user.password = password;
-    user.passwordText = password;
   }
 
   await user.save();
@@ -93,7 +94,7 @@ const updateProfileHandler = asyncHandler(async (req, res) => {
       // Emit real-time event to supplier
       const io = req.app.get('io');
       if (io && roleProfile.supplierId) {
-        const populatedCustomer = await Customer.findById(roleProfile._id).populate('userId', 'fullName phone email isActive username passwordText');
+        const populatedCustomer = await Customer.findById(roleProfile._id).populate('userId', 'fullName phone email isActive username');
         io.to(roleProfile.supplierId.toString()).emit('customerUpdated', populatedCustomer);
       }
     }

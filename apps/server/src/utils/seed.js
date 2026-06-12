@@ -22,17 +22,15 @@ const seedSuperAdmin = async () => {
         fullName: process.env.SUPER_ADMIN_NAME || 'Super Admin',
         role: 'super_admin',
         password: process.env.SUPER_ADMIN_PASSWORD || 'admin123',
-        passwordText: process.env.SUPER_ADMIN_PASSWORD || 'admin123',
         isActive: true
       });
       // Hash is performed in User schema pre-save hook
       await admin.save();
       console.log('✓ Super Admin account seeded successfully');
-    } else if (!existingAdmin.username || !existingAdmin.passwordText) {
-      console.log('⟳ Updating existing Super Admin with username & passwordText...');
+    } else if (!existingAdmin.username) {
+      console.log('⟳ Updating existing Super Admin with username...');
       existingAdmin.username = 'admin';
       existingAdmin.password = process.env.SUPER_ADMIN_PASSWORD || 'admin123';
-      existingAdmin.passwordText = process.env.SUPER_ADMIN_PASSWORD || 'admin123';
       await existingAdmin.save();
       console.log('✓ Super Admin account updated successfully');
     } else {

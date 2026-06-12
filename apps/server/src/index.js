@@ -5,6 +5,8 @@ const http = require('http');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const jwt = require('jsonwebtoken');
+const mongoSanitize = require('express-mongo-sanitize');
 require('dotenv').config();
 
 const { errorHandler, notFoundHandler } = require('./middleware/error.middleware');
@@ -31,7 +33,9 @@ const app = express();
  * Security Middleware
  */
 app.use(helmet({
-  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+  hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
 }));
 
 app.use(cors({
@@ -52,17 +56,18 @@ const generalLimiter = rateLimit({
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 50,
+  max: 10,
   message: 'Too many login attempts'
 });
 
 app.use(generalLimiter);
 
 /**
- * Body Parser
+ * Body Parser & NoSQL Injection Protection
  */
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ limit: '1mb', extended: true }));
+app.use(mongoSanitize());
 
 /**
  * Database Connection (Resilient)
@@ -133,6 +138,7 @@ app.use('/api/orders',
 // Subscription routes (contain both supplier and admin endpoints)
 app.use('/api',
   authenticate,
+  injectTenantScope,
   subscriptionRoutes
 );
 
@@ -165,17 +171,50 @@ app.set('io', io);
 // Initialize Background Jobs
 initCronJobs(io);
 
+// Socket.IO authentication middleware
+io.use(async (socket, next) => {
+  try {
+    const token = socket.handshake.auth?.token;
+    if (!token) return next(new Error('Authentication required'));
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const User = require('./models/User');
+    const user = await User.findById(decoded.userId);
+    if (!user || !user.isActive) return next(new Error('Invalid user'));
+
+    socket.user = user;
+    next();
+  } catch (err) {
+    next(new Error('Authentication failed'));
+  }
+});
+
 io.on('connection', (socket) => {
-  console.log(`Socket connected: ${socket.id}`);
-  
-  socket.on('join_supplier_room', (supplierId) => {
-    socket.join(supplierId);
-    console.log(`Socket ${socket.id} joined supplier room: ${supplierId}`);
+  socket.on('join_supplier_room', async (supplierId) => {
+    // Verify user is authorized for this supplier room
+    let authorized = false;
+    if (socket.user.role === 'super_admin') {
+      authorized = true;
+    } else if (socket.user.role === 'supplier') {
+      const Supplier = require('./models/Supplier');
+      const supplier = await Supplier.findOne({ userId: socket.user._id });
+      authorized = supplier && supplier._id.toString() === supplierId;
+    } else if (socket.user.role === 'delivery_boy') {
+      const DeliveryBoy = require('./models/DeliveryBoy');
+      const rider = await DeliveryBoy.findOne({ userId: socket.user._id });
+      authorized = rider && rider.supplierId.toString() === supplierId;
+    } else if (socket.user.role === 'customer') {
+      const Customer = require('./models/Customer');
+      const customer = await Customer.findOne({ userId: socket.user._id });
+      authorized = customer && customer.supplierId.toString() === supplierId;
+    }
+
+    if (authorized) {
+      socket.join(supplierId);
+    }
   });
 
-  socket.on('disconnect', () => {
-    console.log(`Socket disconnected: ${socket.id}`);
-  });
+  socket.on('disconnect', () => {});
 });
 
 server.listen(PORT, () => {

@@ -24,7 +24,10 @@ const forgotPasswordHandler = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email: email.toLowerCase().trim() });
   if (!user) {
-    return notFound(res, 'No user registered with this email address');
+    return ok(res, {
+      email: email.toLowerCase().trim(),
+      message: 'If this email is registered, a verification code has been sent.'
+    }, 'Verification code generated');
   }
 
   // Generate 6-digit verification code
@@ -34,14 +37,13 @@ const forgotPasswordHandler = asyncHandler(async (req, res) => {
 
   await user.save();
 
-  console.log(`\n==========================================`);
-  console.log(`[RESET PASSWORD] Verification code for ${user.email}: ${resetCode}`);
-  console.log(`==========================================\n`);
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[DEV] Reset code for ${user.email}: ${resetCode}`);
+  }
 
   return ok(res, {
     email: user.email,
-    message: 'Verification code sent successfully to email.',
-    debugCode: resetCode 
+    message: 'If this email is registered, a verification code has been sent.'
   }, 'Verification code generated');
 });
 

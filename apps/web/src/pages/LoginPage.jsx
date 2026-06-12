@@ -110,12 +110,9 @@ export function LoginPage() {
     setSuccessMsg("");
 
     try {
-      const res = await api.post("/auth/forgot-password", { email: resetEmail });
+      await api.post("/auth/forgot-password", { email: resetEmail });
 
-      // Store the generated debug code so the developer can see it or auto-fill it for demo
-      const debugCode = res.data.data?.debugCode;
-
-      setSuccessMsg(`Verification code sent to email. ${debugCode ? `(Testing code: ${debugCode})` : ""}`);
+      setSuccessMsg(`Verification code sent to your email.`);
 
       // Wait a bit to transition
       setTimeout(() => {

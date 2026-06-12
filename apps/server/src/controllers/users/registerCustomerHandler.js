@@ -51,8 +51,10 @@ const registerCustomerHandler = asyncHandler(async (req, res) => {
     return badRequest(res, 'Username must be at least 3 characters');
   }
 
-  if (password.length < 6) {
-    return badRequest(res, 'Password must be at least 6 characters');
+  const { validatePassword } = require('../../utils/passwordValidator');
+  const passValidation = validatePassword(password);
+  if (!passValidation.valid) {
+    return badRequest(res, passValidation.message);
   }
 
   const supplier = await Supplier.findById(supplierId);
@@ -91,7 +93,6 @@ const registerCustomerHandler = asyncHandler(async (req, res) => {
   const user = new User({
     username: username.toLowerCase().trim(),
     password,
-    passwordText: password,
     phone: normalizedPhone,
     fullName: fullName.trim(),
     email: email ? email.toLowerCase().trim() : null,
@@ -133,6 +134,7 @@ const registerCustomerHandler = asyncHandler(async (req, res) => {
     user: {
       _id: user._id,
       username: user.username,
+      initialPassword: password,
       phone: user.phone,
       fullName: user.fullName,
       role: user.role

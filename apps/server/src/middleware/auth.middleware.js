@@ -18,6 +18,14 @@ const authenticate = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
     const { JWT_SECRET } = process.env;
     const decoded = jwt.verify(token, JWT_SECRET);
+
+    // Check if token has been blacklisted (logged out)
+    const TokenBlacklist = require('../models/TokenBlacklist');
+    const isBlacklisted = await TokenBlacklist.findOne({ token });
+    if (isBlacklisted) {
+      return unauthorized(res, 'Token has been revoked');
+    }
+
     const user = await User.findById(decoded.userId);
 
     if (!user || !user.isActive) {

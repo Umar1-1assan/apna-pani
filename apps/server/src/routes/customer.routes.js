@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { requireRole, asyncHandler } = require('../middleware/auth.middleware');
+const { validateObjectId } = require('../middleware/validate.middleware');
 const {
   getCustomerProfile,
   updateCustomerProfile,
@@ -26,6 +27,6 @@ router.put('/cancel', cancelSubscription);
 router.put('/pay-dues', payDues);
 
 // Notify that an invoice is paid (sets to pending_confirmation)
-router.put('/invoices/:id/pay', notifyInvoicePaid);
+router.put('/invoices/:id/pay', validateObjectId('id'), notifyInvoicePaid);
 
 module.exports = router;

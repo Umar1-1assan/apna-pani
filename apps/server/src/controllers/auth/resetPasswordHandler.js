@@ -22,8 +22,10 @@ const resetPasswordHandler = asyncHandler(async (req, res) => {
     return badRequest(res, 'Email, code, and new password are required');
   }
 
-  if (newPassword.length < 6) {
-    return badRequest(res, 'New password must be at least 6 characters long');
+  const { validatePassword } = require('../../utils/passwordValidator');
+  const passValidation = validatePassword(newPassword);
+  if (!passValidation.valid) {
+    return badRequest(res, passValidation.message);
   }
 
   const user = await User.findOne({ email: email.toLowerCase().trim() });
@@ -41,7 +43,6 @@ const resetPasswordHandler = asyncHandler(async (req, res) => {
 
   // Update password and raw password storage
   user.password = newPassword;
-  user.passwordText = newPassword;
   user.resetCode = undefined;
   user.resetCodeExpires = undefined;
 

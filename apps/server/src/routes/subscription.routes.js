@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { requireRole, asyncHandler } = require('../middleware/auth.middleware');
+const { validateObjectId } = require('../middleware/validate.middleware');
 const { ok } = require('../utils/apiResponse');
 
 const Supplier = require('../models/Supplier');
@@ -86,6 +87,7 @@ router.post('/supplier/subscription/request',
 // Submit payment info for an admin invoice
 router.put('/supplier/invoices/:id/pay',
   requireRole('supplier'),
+  validateObjectId('id'),
   asyncHandler(async (req, res) => {
     const { paymentNotes } = req.body;
     
@@ -140,6 +142,7 @@ router.get('/admin/subscriptions',
 // Approve or reject a subscription request
 router.put('/admin/subscriptions/request/:id',
   requireRole('super_admin'),
+  validateObjectId('id'),
   asyncHandler(async (req, res) => {
     const { status, adminNotes, amount, billingPeriodStart, billingPeriodEnd } = req.body;
 

@@ -19,8 +19,14 @@ const createOrder = async (req, res, next) => {
     let customer;
     if (req.user.role === 'customer') {
       customer = await Customer.findOne({ userId: req.user._id });
+      if (customer) {
+        req.supplierId = customer.supplierId;
+      }
     } else {
       customer = await Customer.findById(req.body.customerId);
+      if (customer && customer.supplierId.toString() !== req.supplierId.toString()) {
+        return badRequest(res, 'Customer does not belong to your supplier account');
+      }
     }
     
     if (!customer) {
@@ -108,8 +114,6 @@ const createOrder = async (req, res, next) => {
       }]
     });
 
-    await order.save();
-    
     await order.save();
 
 

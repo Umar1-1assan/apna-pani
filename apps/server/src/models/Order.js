@@ -114,13 +114,13 @@ const OrderSchema = new mongoose.Schema({
 // Pre-save hook to generate sequential Order ID (e.g. ORD-1042)
 OrderSchema.pre('save', async function(next) {
   if (this.isNew) {
-    const lastOrder = await mongoose.model('Order').findOne({}, {}, { sort: { 'createdAt' : -1 } });
-    if (lastOrder && lastOrder.orderId) {
-      const lastNumber = parseInt(lastOrder.orderId.split('-')[1]);
-      this.orderId = `ORD-${lastNumber + 1}`;
-    } else {
-      this.orderId = 'ORD-1000';
-    }
+    const Counter = require('./Counter');
+    const counter = await Counter.findByIdAndUpdate(
+      'orderId',
+      { $inc: { seq: 1 } },
+      { new: true, upsert: true }
+    );
+    this.orderId = `ORD-${counter.seq}`;
   }
   next();
 });

@@ -449,7 +449,6 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
               <thead>
                 <tr className="bg-gray-50/70 text-gray-500 font-semibold border-b border-gray-100">
                   <th className="px-6 py-4">Company & Owner</th>
-                  <th className="px-6 py-4">Credentials</th>
                   <th className="px-6 py-4">Location</th>
                   <th className="px-6 py-4">Subscription Plan</th>
                   <th className="px-6 py-4">Riders & Customers</th>
@@ -465,20 +464,6 @@ export function AdminDashboard({ user, activeTab = "overview" }) {
                         <p className="text-xs text-gray-400 mt-0.5">Owner: {s.userId?.fullName || "N/A"}</p>
                         <p className="text-xs text-gray-400">Phone: {s.userId?.phone || "N/A"}</p>
                         {s.userId?.email && <p className="text-xs text-gray-400">Email: {s.userId.email}</p>}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-2xl space-y-1.5 w-[200px]">
-                        <p className="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
-                          <Key className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                          <span>User:</span>
-                          <span className="font-mono text-blue-600 font-bold select-all truncate ml-auto">{s.userId?.username || "—"}</span>
-                        </p>
-                        <p className="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
-                          <Lock className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                          <span>Pass:</span>
-                          <span className="font-mono text-gray-700 bg-white px-1.5 py-0.5 rounded border border-gray-100 font-bold select-all ml-auto">{s.userId?.passwordText || "—"}</span>
-                        </p>
                       </div>
                     </td>
                     <td className="px-6 py-4">

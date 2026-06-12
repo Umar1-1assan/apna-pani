@@ -20,6 +20,13 @@ const cancelOrder = async (req, res, next) => {
       }
     }
 
+    // Ensure supplier owns the order (if supplier is cancelling)
+    if (req.user.role === 'supplier') {
+      if (order.supplierId.toString() !== req.supplierId.toString()) {
+         return badRequest(res, 'Unauthorized to cancel this order');
+      }
+    }
+
     if (order.status !== 'pending') {
       return badRequest(res, `Cannot cancel order in ${order.status} status.`);
     }

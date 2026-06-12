@@ -5,7 +5,7 @@
   "server": {
     "androidScheme": "https",
     "hostname": "apnapani.com",
-    "cleartext": true
+    "cleartext": false
   },
   "plugins": {
     "CapacitorHttp": {

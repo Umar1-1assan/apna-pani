@@ -8,7 +8,13 @@ const updateOrderStatus = async (req, res, next) => {
     const { id } = req.params;
     const { status, paymentStatus, emptyCarboysReturned, failureReason } = req.body;
 
-    const order = await Order.findById(id);
+    const filter = { _id: id };
+    if (req.user.role === 'supplier') {
+      filter.supplierId = req.supplierId;
+    } else if (req.user.role === 'delivery_boy') {
+      filter.deliveryBoyId = req.riderId;
+    }
+    const order = await Order.findOne(filter);
     if (!order) return notFound(res, 'Order not found');
 
     const previousStatus = order.status;
@@ -64,8 +70,6 @@ const updateOrderStatus = async (req, res, next) => {
         }
       }
     }
-
-    await order.save();
 
     await order.save();
 

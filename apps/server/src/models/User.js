@@ -33,11 +33,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     select: false
   },
-  passwordText: {
-    type: String
-  },
+
   resetCode: {
-    type: String
+    type: String,
+    select: false
   },
   resetCodeExpires: {
     type: Date

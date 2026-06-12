@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { requireRole, asyncHandler } = require('../middleware/auth.middleware');
+const { validateObjectId } = require('../middleware/validate.middleware');
 const { ok } = require('../utils/apiResponse');
 const Invoice = require('../models/Invoice');
 
@@ -27,7 +28,11 @@ router.post('/generate-billing', requireRole('supplier'), asyncHandler(async (re
 
 // POST /api/invoices/generate-early/:customerId
 // Manual trigger to generate an invoice early for a specific customer
-router.post('/generate-early/:customerId', requireRole('supplier'), asyncHandler(async (req, res) => {
+router.post('/generate-early/:customerId', requireRole('supplier'), validateObjectId('customerId'), asyncHandler(async (req, res) => {
+  const Customer = require('../models/Customer');
+  const customer = await Customer.findOne({ _id: req.params.customerId, supplierId: req.supplierId });
+  if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
+
   const { generateInvoiceForCustomer } = require('../services/invoice.service');
   const io = req.app.get('io');
   const result = await generateInvoiceForCustomer(req.params.customerId, io);
@@ -42,6 +47,13 @@ router.post('/generate-early/:customerId', requireRole('supplier'), asyncHandler
 // POST /api/invoices (Ad-hoc manual invoice)
 router.post('/', requireRole('supplier'), asyncHandler(async (req, res) => {
   const { customerId, periodStart, periodEnd, amount, bottlesDelivered } = req.body;
+  const mongoose = require('mongoose');
+  if (!mongoose.Types.ObjectId.isValid(customerId)) {
+    return res.status(400).json({ success: false, message: 'Invalid customerId format' });
+  }
+  const Customer = require('../models/Customer');
+  const customer = await Customer.findOne({ _id: customerId, supplierId: req.supplierId });
+  if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
   
   const invoice = new Invoice({
     supplierId: req.supplierId,
@@ -66,7 +78,7 @@ router.post('/', requireRole('supplier'), asyncHandler(async (req, res) => {
 }));
 
 // PUT /api/invoices/:id/confirm-payment
-router.put('/:id/confirm-payment', requireRole('supplier'), asyncHandler(async (req, res) => {
+router.put('/:id/confirm-payment', requireRole('supplier'), validateObjectId('id'), asyncHandler(async (req, res) => {
   const { id } = req.params;
   const invoice = await Invoice.findOne({ _id: id, supplierId: req.supplierId });
   if (!invoice) {
@@ -118,9 +130,14 @@ router.get('/rider/pending', requireRole('delivery_boy'), asyncHandler(async (re
 }));
 
 // PUT /api/invoices/:id/rider-collect
-router.put('/:id/rider-collect', requireRole('delivery_boy'), asyncHandler(async (req, res) => {
+router.put('/:id/rider-collect', requireRole('delivery_boy'), validateObjectId('id'), asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const invoice = await Invoice.findOne({ _id: id });
+  
+  // Scope to rider's assigned customers only
+  const Customer = require('../models/Customer');
+  const assignedCustomers = await Customer.find({ deliveryBoyId: req.riderId }).select('_id');
+  const customerIds = assignedCustomers.map(c => c._id);
+  const invoice = await Invoice.findOne({ _id: id, customerId: { $in: customerIds } });
   
   if (!invoice) {
     return res.status(404).json({ success: false, message: 'Invoice not found' });
@@ -138,7 +155,6 @@ router.put('/:id/rider-collect', requireRole('delivery_boy'), asyncHandler(async
   await invoice.save();
 
   // Deduct from customer's outstanding dues
-  const Customer = require('../models/Customer');
   const customer = await Customer.findById(invoice.customerId);
   if (customer) {
      customer.outstandingDues -= invoice.totalAmount;

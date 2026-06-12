@@ -1,5 +1,17 @@
 const express = require('express');
 const router = express.Router();
+const { authenticate } = require('../middleware/auth.middleware');
+const rateLimit = require('express-rate-limit');
+
+const resetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  message: {
+    success: false,
+    message: 'Too many password reset attempts from this IP, please try again after 15 minutes'
+  }
+});
+
 const {
   sendOtpHandler,
   verifyOtpHandler,
@@ -17,10 +29,10 @@ const {
 router.post('/login', loginHandler);
 
 // POST /api/auth/forgot-password
-router.post('/forgot-password', forgotPasswordHandler);
+router.post('/forgot-password', resetLimiter, forgotPasswordHandler);
 
 // POST /api/auth/reset-password
-router.post('/reset-password', resetPasswordHandler);
+router.post('/reset-password', resetLimiter, resetPasswordHandler);
 
 // POST /api/auth/send-otp
 router.post('/send-otp', sendOtpHandler);
@@ -35,6 +47,6 @@ router.post('/refresh', refreshTokenHandler);
 router.post('/admin/login', adminLoginHandler);
 
 // POST /api/auth/logout
-router.post('/logout', logoutHandler);
+router.post('/logout', authenticate, logoutHandler);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { requireRole, asyncHandler } = require('../middleware/auth.middleware');
+const { validateObjectId } = require('../middleware/validate.middleware');
 const { ok } = require('../utils/apiResponse');
 const { registerRiderHandler, registerCustomerHandler } = require('../controllers/users');
 const Supplier = require('../models/Supplier');
@@ -127,7 +128,7 @@ router.get('/customers',
     const limit = plan ? plan.maxCustomers : 20;
 
     const customers = await Customer.find({ supplierId: req.supplierId })
-      .populate('userId', 'fullName phone email isActive username passwordText')
+      .populate('userId', 'fullName phone email isActive username')
       .sort({ createdAt: 1 }) // oldest first
       .limit(limit);
     return ok(res, customers, 'List of customers');
@@ -143,6 +144,7 @@ router.post('/customers',
 // PUT /api/suppliers/customers/:id
 router.put('/customers/:id',
   requireRole('supplier'),
+  validateObjectId('id'),
   asyncHandler(async (req, res) => {
     const { fullName, phone, email, address, bottlesPerDelivery, deliveryFrequency, bottlePrice, deliveryBoyId, status, password, deliveryCharges, preferredDeliveryTime, billingCycle } = req.body;
     
@@ -169,8 +171,12 @@ router.put('/customers/:id',
         if (phone) user.phone = phone;
         if (email) user.email = email;
         if (password) {
+          const { validatePassword } = require('../utils/passwordValidator');
+          const passValidation = validatePassword(password);
+          if (!passValidation.valid) {
+            return res.status(400).json({ success: false, message: passValidation.message });
+          }
           user.password = password;
-          user.passwordText = password;
         }
         await user.save();
       }
@@ -183,6 +189,7 @@ router.put('/customers/:id',
 // DELETE /api/suppliers/customers/:id
 router.delete('/customers/:id',
   requireRole('supplier'),
+  validateObjectId('id'),
   asyncHandler(async (req, res) => {
     const customer = await Customer.findOne({ _id: req.params.id, supplierId: req.supplierId });
     if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
@@ -207,7 +214,7 @@ router.get('/riders',
     const limit = plan ? plan.maxRiders : 3;
 
     const riders = await DeliveryBoy.find({ supplierId: req.supplierId })
-      .populate('userId', 'fullName phone email isActive username passwordText')
+      .populate('userId', 'fullName phone email isActive username')
       .sort({ createdAt: 1 }) // oldest first
       .limit(limit);
     return ok(res, riders, 'List of riders');
@@ -223,6 +230,7 @@ router.post('/riders',
 // PUT /api/suppliers/riders/:id
 router.put('/riders/:id',
   requireRole('supplier'),
+  validateObjectId('id'),
   asyncHandler(async (req, res) => {
     const { fullName, phone, password, areaName, shiftTiming, assignedVehicle, licenseNumber, isActive } = req.body;
     
@@ -246,8 +254,12 @@ router.put('/riders/:id',
         if (isActive !== undefined) user.isActive = isActive;
         if (phone) user.phone = phone;
         if (password) {
+          const { validatePassword } = require('../utils/passwordValidator');
+          const passValidation = validatePassword(password);
+          if (!passValidation.valid) {
+            return res.status(400).json({ success: false, message: passValidation.message });
+          }
           user.password = password;
-          user.passwordText = password;
         }
         await user.save();
       }
@@ -260,6 +272,7 @@ router.put('/riders/:id',
 // DELETE /api/suppliers/riders/:id
 router.delete('/riders/:id',
   requireRole('supplier'),
+  validateObjectId('id'),
   asyncHandler(async (req, res) => {
     const DeliveryBoy = require('../models/DeliveryBoy');
     const Customer = require('../models/Customer');
@@ -386,6 +399,7 @@ router.post('/products',
 // PUT /api/suppliers/products/:id
 router.put('/products/:id',
   requireRole('supplier'),
+  validateObjectId('id'),
   asyncHandler(async (req, res) => {
     const { name, description, price, isAvailable } = req.body;
 
@@ -405,6 +419,7 @@ router.put('/products/:id',
 // DELETE /api/suppliers/products/:id
 router.delete('/products/:id',
   requireRole('supplier'),
+  validateObjectId('id'),
   asyncHandler(async (req, res) => {
     const product = await Product.findOneAndDelete({ _id: req.params.id, supplierId: req.supplierId });
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
@@ -416,6 +431,7 @@ router.delete('/products/:id',
 // PATCH /api/suppliers/products/:id/toggle
 router.patch('/products/:id/toggle',
   requireRole('supplier'),
+  validateObjectId('id'),
   asyncHandler(async (req, res) => {
     const product = await Product.findOne({ _id: req.params.id, supplierId: req.supplierId });
     if (!product) return res.status(404).json({ success: false, message: 'Product not found' });
@@ -430,6 +446,7 @@ router.patch('/products/:id/toggle',
 // PUT /api/suppliers/riders/:id/receive-cash
 router.put('/riders/:id/receive-cash',
   requireRole('supplier'),
+  validateObjectId('id'),
   asyncHandler(async (req, res) => {
     const deliveryBoy = await DeliveryBoy.findOne({ _id: req.params.id, supplierId: req.supplierId });
     

@@ -22,8 +22,8 @@ const errorHandler = (err, req, res, next) => {
     const field = Object.keys(err.keyValue)[0];
     return res.status(409).json({
       statusCode: 409,
-      message: `${field} already exists`,
-      data: { field, value: err.keyValue[field] },
+      message: `A record with this ${field} already exists`,
+      data: null,
       success: false,
       timestamp: new Date().toISOString()
     });
@@ -33,7 +33,7 @@ const errorHandler = (err, req, res, next) => {
   if (err.name === 'CastError') {
     return res.status(400).json({
       statusCode: 400,
-      message: `Invalid ${err.path}: ${err.value}`,
+      message: `Invalid format for ${err.path}`,
       success: false,
       timestamp: new Date().toISOString()
     });

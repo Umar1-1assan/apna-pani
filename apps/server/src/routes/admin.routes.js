@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { requireRole, asyncHandler } = require('../middleware/auth.middleware');
+const { validateObjectId } = require('../middleware/validate.middleware');
 const { ok } = require('../utils/apiResponse');
 
 /**
@@ -15,7 +16,7 @@ router.get('/suppliers',
   requireRole('super_admin'),
   asyncHandler(async (req, res) => {
     const suppliers = await Supplier.find({})
-      .populate('userId', 'fullName phone email username passwordText')
+      .populate('userId', 'fullName phone email username')
       .sort({ createdAt: -1 });
     return ok(res, suppliers, 'List of all suppliers');
   })
@@ -30,6 +31,7 @@ router.post('/suppliers',
 // PUT /api/admin/suppliers/:id/plan
 router.put('/suppliers/:id/plan',
   requireRole('super_admin'),
+  validateObjectId('id'),
   asyncHandler(async (req, res) => {
     const { plan } = req.body;
     if (!['basic', 'standard', 'enterprise'].includes(plan)) {
@@ -51,6 +53,7 @@ router.put('/suppliers/:id/plan',
 // PUT /api/admin/suppliers/:id/status
 router.put('/suppliers/:id/status',
   requireRole('super_admin'),
+  validateObjectId('id'),
   asyncHandler(async (req, res) => {
     const { isActive } = req.body;
     
@@ -98,8 +101,10 @@ router.post('/change-password',
       return res.status(400).json({ success: false, message: 'Current and new passwords are required' });
     }
     
-    if (newPassword.length < 6) {
-      return res.status(400).json({ success: false, message: 'New password must be at least 6 characters' });
+    const { validatePassword } = require('../utils/passwordValidator');
+    const passValidation = validatePassword(newPassword);
+    if (!passValidation.valid) {
+      return res.status(400).json({ success: false, message: passValidation.message });
     }
     
     const User = require('../models/User');
@@ -115,7 +120,6 @@ router.post('/change-password',
     }
     
     user.password = newPassword;
-    user.passwordText = newPassword;
     await user.save();
     
     return ok(res, {}, 'Password updated successfully');
@@ -162,6 +166,7 @@ router.post('/invoices',
 // PUT /api/admin/invoices/:id/status
 router.put('/invoices/:id/status',
   requireRole('super_admin'),
+  validateObjectId('id'),
   asyncHandler(async (req, res) => {
     const { status } = req.body;
     if (!['unpaid', 'pending_verification', 'paid', 'overdue'].includes(status)) {
