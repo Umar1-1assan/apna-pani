@@ -443,7 +443,7 @@ export function LandingPage() {
               <div className="relative z-10 bg-white rounded-2xl shadow-[0_12px_32px_rgba(10,100,122,0.06)] border border-[#11a2c2]/15 overflow-hidden transform md:-rotate-1 hover:rotate-0 transition-transform duration-500">
                 <img
                   src="/screen.png"
-                  alt="Apna Pani Dashboard Interface"
+                  alt="AquaFlow Dashboard Interface"
                   className="w-full h-auto object-cover opacity-95"
                 />
 

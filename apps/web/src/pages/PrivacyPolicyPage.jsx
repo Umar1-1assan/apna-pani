@@ -16,7 +16,7 @@ export function PrivacyPolicyPage() {
       <header className="bg-white border-b border-[#11a2c2]/10 py-4">
         <div className="max-w-[1280px] mx-auto px-5 md:px-[64px] flex justify-between items-center">
           <Link to="/" className="text-xl font-extrabold text-[#0a647a] tracking-tight">
-            {language === "ur" ? "اپنا پانی" : "Apna Pani"}
+            {language === "ur" ? "ایکوافلو" : "AquaFlow"}
           </Link>
           <Link to="/" className="text-sm font-semibold text-[#0a647a] hover:text-[#0c7a94] hover:underline">
             {language === "ur" ? "ہوم پیج پر واپس جائیں" : "Back to Home"}
@@ -74,7 +74,7 @@ export function PrivacyPolicyPage() {
 
       {/* Mini Footer */}
       <footer className="bg-white border-t border-[#11a2c2]/10 py-6 text-center text-xs text-[#414755] font-semibold">
-        © {new Date().getFullYear()} {language === "ur" ? "اپنا پانی" : "Apna Pani"} Systems. All rights reserved.
+        © {new Date().getFullYear()} {language === "ur" ? "ایکوافلو" : "AquaFlow"} Systems. All rights reserved.
       </footer>
     </div>
   );
