@@ -118,7 +118,9 @@ const localTranslations = {
     rightsReserved: "All rights reserved.",
     brandName: "AquaFlow",
     pricing: "Pricing Plans",
-    contactUs: "Contact Us"
+    contactUs: "Contact Us",
+    riderCustomerAppTitle: "Rider & Customer Mobile App",
+    riderCustomerAppDesc: "Empower riders with turn-by-turn navigation and instant delivery proof, while offering customers real-time GPS tracking and seamless ordering."
   },
   ur: {
     features: "خصوصیات",
@@ -231,7 +233,9 @@ const localTranslations = {
     rightsReserved: "جملہ حقوق محفوظ ہیں۔",
     brandName: "ایکوافلو",
     pricing: "پلانز",
-    contactUs: "رابطہ کریں"
+    contactUs: "رابطہ کریں",
+    riderCustomerAppTitle: "رائیڈر اور کسٹمر موبائل ایپ",
+    riderCustomerAppDesc: "رائیڈرز کے لیے آسان نیویگیشن اور ڈلیوری کا ثبوت، اور صارفین کے لیے لائیو لوکیشن ٹریکنگ اور آسان آرڈرز کی سہولت۔"
   }
 };
 
@@ -304,8 +308,181 @@ export function LandingPage() {
     }
   };
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Minimum swipe distance in pixels
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe && currentSlide < 2) {
+      setCurrentSlide((prev) => prev + 1);
+    }
+    if (isRightSwipe && currentSlide > 0) {
+      setCurrentSlide((prev) => prev - 1);
+    }
+  };
+
   // Authenticated users go straight to dashboard
   if (token) return <Navigate to="/dashboard" replace />;
+
+  if (isMobile) {
+    const slides = [
+      {
+        id: "delivery_management",
+        icon: "assignment",
+        title: tLocal("feature1Title"),
+        desc: tLocal("feature1Desc"),
+        color: "from-[#11a2c2]/20 to-[#0a647a]/20",
+        iconColor: "text-[#11a2c2]",
+        bgAccent: "bg-[#e8f8fb]",
+        graphic: (
+          <div className="relative w-full h-48 rounded-2xl border border-[#11a2c2]/10 overflow-hidden shadow-md bg-white">
+            <img 
+              src="/order_management.png" 
+              alt="Complete Order & Automated Delivery Management" 
+              className="w-full h-full object-cover" 
+            />
+          </div>
+        )
+      },
+      {
+        id: "billing_invoice",
+        icon: "receipt_long",
+        title: tLocal("feature2Title"),
+        desc: tLocal("feature2Desc"),
+        color: "from-[#e8f8fb] to-[#11a2c2]/10",
+        iconColor: "text-[#0a647a]",
+        bgAccent: "bg-[#0a647a]/10",
+        graphic: (
+          <div className="relative w-full h-48 rounded-2xl border border-[#11a2c2]/10 overflow-hidden shadow-md bg-white">
+            <img 
+              src="/billing_invoice.png" 
+              alt="Automated Billing & Invoicing" 
+              className="w-full h-full object-cover" 
+            />
+          </div>
+        )
+      },
+      {
+        id: "rider_customer_app",
+        icon: "phone_android",
+        title: tLocal("riderCustomerAppTitle"),
+        desc: tLocal("riderCustomerAppDesc"),
+        color: "from-[#e8f8fb] to-[#0a647a]/10",
+        iconColor: "text-[#11a2c2]",
+        bgAccent: "bg-[#11a2c2]/10",
+        graphic: (
+          <div className="relative w-full h-48 rounded-2xl border border-[#11a2c2]/10 overflow-hidden shadow-md bg-white">
+            <img 
+              src="/route_map.png" 
+              alt="Rider & Customer Mobile App" 
+              className="w-full h-full object-cover" 
+            />
+          </div>
+        )
+      }
+    ];
+
+    return (
+      <div className="bg-white min-h-screen flex flex-col justify-between selection:bg-[#e8f8fb] selection:text-[#0a647a] font-sans antialiased overflow-hidden">
+        {/* Onboarding Header */}
+        <header className="px-5 py-4 flex justify-between items-center bg-white border-b border-[#11a2c2]/10">
+          <div className="flex items-center gap-2.5">
+            <Logo size={44} showText={false} />
+            <span className="text-xl font-extrabold text-[#0a647a] tracking-tight">
+              {tLocal("brandName")}
+            </span>
+          </div>
+          <button
+            onClick={toggleLanguage}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-[#11a2c2]/20 bg-[#11a2c2]/5 hover:bg-[#11a2c2]/10 text-xs font-semibold text-[#0a647a] transition-all cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[14px]">globe</span>
+            {language === "en" ? "اردو" : "English"}
+          </button>
+        </header>
+
+        {/* Carousel / Slider Container */}
+        <div 
+          className="flex-grow flex flex-col justify-center px-6 py-6"
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
+          {/* Active slide card */}
+          <div className="w-full max-w-sm mx-auto flex flex-col gap-6 text-center animate-fadeIn duration-300">
+            {/* Graphic Illustration */}
+            <div className="px-2">
+              {slides[currentSlide].graphic}
+            </div>
+
+            {/* Slide Text Content */}
+            <div className="flex flex-col gap-3 px-4">
+              <div className="flex items-center justify-center gap-2">
+                <div className={`w-10 h-10 rounded-full ${slides[currentSlide].bgAccent} flex items-center justify-center ${slides[currentSlide].iconColor}`}>
+                  <span className="material-symbols-outlined text-[20px]">{slides[currentSlide].icon}</span>
+                </div>
+                <h2 className="text-xl font-extrabold text-[#1a1c1e]">{slides[currentSlide].title}</h2>
+              </div>
+              <p className="text-sm text-[#414755] leading-relaxed font-semibold min-h-[72px]">
+                {slides[currentSlide].desc}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Control Section */}
+        <div className="px-6 pb-8 pt-4 bg-white border-t border-[#11a2c2]/5 flex flex-col gap-5">
+          {/* Pagination Indicators (Dots) */}
+          <div className="flex justify-center gap-2">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`h-2.5 rounded-full transition-all duration-300 ${
+                  currentSlide === index ? "w-6 bg-[#0a647a]" : "w-2.5 bg-gray-200"
+                }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+
+          {/* Login Button with Arrow */}
+          <Link
+            to="/login"
+            className="w-full py-4 px-6 bg-[#0a647a] hover:bg-[#0c7a94] active:scale-[0.98] !text-white rounded-xl font-bold text-base transition-all flex items-center justify-between shadow-md hover:shadow-lg cursor-pointer"
+          >
+            <span className="flex-grow text-center">{tLocal("getStarted")}</span>
+            <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#f9f9fc] text-[#1a1c1e] antialiased font-sans overflow-x-hidden selection:bg-[#e8f8fb] selection:text-[#0a647a] min-h-screen flex flex-col">
@@ -314,7 +491,7 @@ export function LandingPage() {
       <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-[#11a2c2]/10 shadow-sm">
         <div className="max-w-[1280px] mx-auto flex justify-between items-center px-5 md:px-[64px] py-4">
           <div className="flex items-center gap-2.5">
-            <Logo size={32} showText={false} />
+            <Logo size={48} showText={false} />
             <span className="text-xl font-extrabold text-[#0a647a] tracking-tight">
               {tLocal("brandName")}
             </span>
@@ -1084,7 +1261,7 @@ export function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div className="md:col-span-1 flex flex-col gap-3">
               <div className="flex items-center gap-2.5">
-                <Logo size={24} showText={false} />
+                <Logo size={40} showText={false} />
                 <span className="text-lg font-bold text-[#0a647a]">{tLocal("brandName")}</span>
               </div>
               <p className="text-xs leading-relaxed font-semibold">
