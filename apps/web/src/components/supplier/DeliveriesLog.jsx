@@ -78,11 +78,11 @@ export function DeliveriesLog({ riders, supplierProfile, onUpdateSupplierProfile
       const res = await api.post('/suppliers/deliveries/generate-today');
       const generatedCount = res.data.data?.generatedCount || 0;
       
-      // Auto-regenerate if viewing today's deliveries
-      if (selectedDate === getLocalYMD()) {
-        const refreshRes = await api.get(`/orders/supplier?date=${selectedDate}`);
-        setDailyOrders(refreshRes.data.data || []);
-      }
+      // Always refresh the currently viewed date to show the "menu refresh" effect
+      setLoading(true);
+      const refreshRes = await api.get(`/orders/supplier?date=${selectedDate}`);
+      setDailyOrders(refreshRes.data.data || []);
+      setLoading(false);
       
       setSyncResultModal({
         success: true,
@@ -93,6 +93,7 @@ export function DeliveriesLog({ riders, supplierProfile, onUpdateSupplierProfile
         success: false,
         message: err.response?.data?.message || "Failed to generate deliveries"
       });
+      setLoading(false);
     } finally {
       setGenerating(false);
     }

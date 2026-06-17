@@ -155,19 +155,7 @@ export function DashboardPage() {
               <h4 className="font-bold text-xs text-gray-800 truncate">{displayName}</h4>
               <p className="text-[10px] text-gray-500 truncate">{user?.phone || t('no_phone')}</p>
             </div>
-            <button onClick={handleLogout} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-              <LogOut size={16} />
-            </button>
           </div>
-          
-          {/* Language Switcher */}
-          {role !== "super_admin" && (
-            <button onClick={toggleLanguage} className="mt-2 w-full flex items-center justify-center gap-2 p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs transition-colors">
-              <Settings size={14} />
-              {language === 'en' ? t('switch_to_urdu') : t('switch_to_english')}
-            </button>
-          )}
-
         </div>
       </aside>
 
@@ -203,14 +191,6 @@ export function DashboardPage() {
               </button>
             );
           })}
-          {/* Logout button */}
-          <button
-            onClick={handleLogout}
-            className="flex flex-col items-center justify-center gap-1 min-w-[64px] px-2 py-2 text-gray-400 active:text-red-500 transition-colors duration-200"
-          >
-            <LogOut size={22} strokeWidth={2} />
-            <span className="text-[10px] leading-tight font-medium whitespace-nowrap">Logout</span>
-          </button>
         </div>
       </nav>
 
@@ -271,7 +251,7 @@ export function DashboardPage() {
       </main>
 
       {/* Profile Modal */}
-      <ProfileModal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} />
+      <ProfileModal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} onLogout={handleLogout} />
     </div>
   );
 }

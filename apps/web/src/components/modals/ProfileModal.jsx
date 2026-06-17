@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../contexts/LanguageContext';
-import { User, Building2, MapPin, Phone, Mail, Lock, Loader2, KeyRound } from 'lucide-react';
+import { User, Building2, MapPin, Phone, Mail, Lock, Loader2, KeyRound, Globe, LogOut } from 'lucide-react';
 import { api } from '../../api/client';
 import toast from 'react-hot-toast';
 
-export default function ProfileModal({ isOpen, onClose }) {
-  const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('personal'); // personal, business
+export default function ProfileModal({ isOpen, onClose, onLogout }) {
+  const { t, language, toggleLanguage } = useTranslation();
+  const [activeTab, setActiveTab] = useState('personal'); // personal, business, settings
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState(null);
@@ -126,11 +126,11 @@ export default function ProfileModal({ isOpen, onClose }) {
             <div className="flex px-6 pt-4 border-b border-gray-100 gap-6">
               <button
                 onClick={() => setActiveTab('personal')}
-                className={`pb-3 text-sm font-medium transition-colors relative ${
+                className={`pb-3 text-sm font-medium transition-colors relative capitalize ${
                   activeTab === 'personal' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'
                 }`}
               >
-                {t('personal_details') || 'Personal Details'}
+                {t('personal_details') || 'Personal'}
                 {activeTab === 'personal' && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-t-full" />
                 )}
@@ -138,17 +138,30 @@ export default function ProfileModal({ isOpen, onClose }) {
               
               <button
                 onClick={() => setActiveTab('business')}
-                className={`pb-3 text-sm font-medium transition-colors relative ${
+                className={`pb-3 text-sm font-medium transition-colors relative capitalize ${
                   activeTab === 'business' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'
                 }`}
               >
                 {profile.user.role === 'supplier' 
-                  ? (t('business_details') || 'Business Details')
+                  ? (t('business_details') || 'Business')
                   : profile.user.role === 'delivery_boy'
-                    ? (t('route_details') || 'Route Details')
-                    : (t('address_details') || 'Address Details')
+                    ? (t('route_details') || 'Route')
+                    : (t('address_details') || 'Address')
                 }
                 {activeTab === 'business' && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-t-full" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('settings')}
+                className={`pb-3 text-sm font-medium transition-colors relative capitalize ${
+                  activeTab === 'settings' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-900'
+                }`}
+              >
+                {t('settings') || 'Settings'}
+                {activeTab === 'settings' && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 rounded-t-full" />
                 )}
               </button>
@@ -340,24 +353,51 @@ export default function ProfileModal({ isOpen, onClose }) {
                 </div>
               )}
 
+              {activeTab === 'settings' && (
+                <div className="space-y-5 animate-in slide-in-from-right-4 duration-200">
+                  <div className="p-5 bg-gray-50 border border-gray-100 rounded-xl flex flex-col gap-4">
+                    <h3 className="text-sm font-semibold text-gray-900">{t('app_settings') || 'App Settings'}</h3>
+                    
+                    <button type="button" onClick={toggleLanguage} className="w-full flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-300 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                          <Globe className="w-4 h-4" />
+                        </div>
+                        <span className="font-semibold text-sm text-gray-800">{language === 'en' ? t('switch_to_urdu') : t('switch_to_english')}</span>
+                      </div>
+                      <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">{language === 'en' ? 'EN' : 'UR'}</span>
+                    </button>
+
+                    <button type="button" onClick={onLogout} className="w-full flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-xl hover:bg-red-100 transition-colors text-red-600">
+                      <div className="w-8 h-8 rounded-full bg-white text-red-600 flex items-center justify-center shadow-sm">
+                        <LogOut className="w-4 h-4" />
+                      </div>
+                      <span className="font-bold text-sm">{t('logout') || 'Logout'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Actions */}
-              <div className="pt-6 mt-6 border-t border-gray-100 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-5 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors"
-                >
-                  {t('cancel')}
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all disabled:opacity-50"
-                >
-                  {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {t('save_changes') || 'Save Changes'}
-                </button>
-              </div>
+              {activeTab !== 'settings' && (
+                <div className="pt-6 mt-6 border-t border-gray-100 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="px-5 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-colors"
+                  >
+                    {t('cancel')}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm font-medium rounded-xl shadow-lg shadow-blue-500/30 transition-all disabled:opacity-50"
+                  >
+                    {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {t('save_changes') || 'Save Changes'}
+                  </button>
+                </div>
+              )}
 
             </form>
           </>

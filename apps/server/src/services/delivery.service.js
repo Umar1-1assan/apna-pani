@@ -22,6 +22,23 @@ async function generateDeliveriesForSupplier(supplierId, io = null) {
     
     const currentDayOfWeek = today.getDay();
 
+    // 1. Auto-fail any past due deliveries for this supplier
+    await Order.updateMany(
+      {
+        supplierId,
+        status: { $in: ['pending', 'assigned', 'in_transit'] },
+        deliveryDate: { $lt: today }
+      },
+      {
+        $set: {
+          status: 'failed',
+          failureReason: 'Auto-failed: Not delivered on scheduled date.',
+          notes: 'System: Automatically marked as failed due to missing delivery.'
+        }
+      }
+    );
+
+    // 2. Process Supplier Details
     const supplier = await Supplier.findById(supplierId);
     if (!supplier || !supplier.isActive) {
       return { success: false, count: 0, message: 'Supplier not found or inactive' };

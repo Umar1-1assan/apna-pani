@@ -20,6 +20,8 @@ export function CustomerDashboard({ activeTab }) {
   const [error, setError] = useState("");
   const [profileData, setProfileData] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [filterYear, setFilterYear] = useState(new Date().getFullYear().toString());
+  const [filterMonth, setFilterMonth] = useState(new Date().getMonth().toString());
   const [invoices, setInvoices] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
@@ -134,15 +136,15 @@ export function CustomerDashboard({ activeTab }) {
   const renderOverview = () => (
     <div className="space-y-4 animate-fadeIn max-w-5xl mx-auto">
       {/* Hero Welcome */}
-      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-white/80 backdrop-blur-md rounded-3xl p-5 sm:p-6 border border-white/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">{t("welcome", { name: customer?.userId?.fullName?.split(' ')[0] || 'Customer' })}!</h2>
           <p className="text-gray-500 mt-1 text-sm font-medium flex items-center gap-1.5">
             <MapPin className="w-4 h-4 text-blue-500" /> {customer?.address || t("no_address_set")}
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-full font-bold text-xs shadow-sm">
-          <CheckCircle className="w-3.5 h-3.5" /> {t("status_active")}
+        <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-2 rounded-2xl font-bold text-xs shadow-sm border border-emerald-100/50">
+          <CheckCircle className="w-4 h-4" /> {t("status_active")}
         </div>
       </div>
 
@@ -150,28 +152,31 @@ export function CustomerDashboard({ activeTab }) {
       {dashboardStats && (
         <div className="mb-4">
           {dashboardStats.deliveryToday ? (
-            <div className="flex items-center justify-between gap-3 bg-gradient-to-r from-blue-600 to-indigo-600 p-4 sm:p-5 rounded-2xl shadow-md text-white">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0 border border-white/30">
-                  <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            <div className="relative overflow-hidden flex items-center justify-between gap-3 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 p-5 sm:p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] text-white">
+              <div className="absolute -right-6 -top-6 opacity-10">
+                <Package className="w-32 h-32" />
+              </div>
+              <div className="relative z-10 flex items-center gap-4">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 border border-white/30 shadow-inner">
+                  <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white drop-shadow-md" />
                 </div>
                 <div>
-                  <h4 className="text-base sm:text-lg font-black leading-tight">Delivery Today!</h4>
-                  <p className="text-blue-100 text-xs sm:text-sm font-medium mt-0.5">{dashboardStats.deliveryTodayDetails?.quantity || customer?.bottlesPerDelivery} bottles arriving.</p>
+                  <h4 className="text-lg sm:text-xl font-black leading-tight drop-shadow-sm">Delivery Today!</h4>
+                  <p className="text-blue-100 text-sm font-medium mt-0.5">{dashboardStats.deliveryTodayDetails?.quantity || customer?.bottlesPerDelivery} bottles arriving.</p>
                 </div>
               </div>
-              <div className="bg-white text-blue-600 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl text-center shadow-sm shrink-0">
-                <div className="text-[10px] text-gray-500 uppercase font-bold">Status</div>
-                <div className="text-xs sm:text-sm font-black uppercase">{dashboardStats.deliveryTodayDetails?.status || 'Scheduled'}</div>
+              <div className="relative z-10 bg-white/10 backdrop-blur-md border border-white/20 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl text-center shadow-lg shrink-0">
+                <div className="text-[10px] text-blue-200 uppercase font-bold tracking-wider mb-0.5">Status</div>
+                <div className="text-xs sm:text-sm font-black uppercase drop-shadow-sm">{dashboardStats.deliveryTodayDetails?.status || 'Scheduled'}</div>
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 p-4 rounded-2xl shadow-sm">
-              <div className="w-10 h-10 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center shrink-0">
-                <CalendarDays className="w-5 h-5" />
+            <div className="flex items-center gap-4 bg-white/60 backdrop-blur-md border border-gray-100 p-5 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+              <div className="w-12 h-12 rounded-2xl bg-gray-100 text-gray-500 flex items-center justify-center shrink-0 border border-gray-200">
+                <CalendarDays className="w-6 h-6" />
               </div>
               <div>
-                <h4 className="text-sm sm:text-base font-bold text-gray-800 leading-tight">No delivery today</h4>
+                <h4 className="text-base sm:text-lg font-bold text-gray-800 leading-tight">No delivery today</h4>
                 <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Next projected delivery: <span className="font-bold text-gray-700">{dashboardStats.nextDeliveryDate ? new Date(dashboardStats.nextDeliveryDate).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) : 'Unknown'}</span></p>
               </div>
             </div>
@@ -182,83 +187,86 @@ export function CustomerDashboard({ activeTab }) {
       {/* Quick Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
         {/* Usage Progress */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-center col-span-2 md:col-span-1">
-          <div className="flex items-center justify-between mb-2 sm:mb-3">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-50 text-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
-                <Droplets className="w-4 h-4 sm:w-5 sm:h-5" />
+        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col justify-center col-span-2 md:col-span-1 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50/50 text-blue-600 rounded-2xl flex items-center justify-center shrink-0 border border-blue-100/50">
+                <Droplets className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <p className="text-xs sm:text-sm text-gray-500 font-bold uppercase tracking-wider">Usage</p>
             </div>
-            <span className="text-xl sm:text-2xl font-black text-blue-600">{dashboardStats?.bottlesReceivedThisCycle || 0}</span>
+            <span className="text-2xl sm:text-3xl font-black text-blue-600 drop-shadow-sm">{dashboardStats?.bottlesReceivedThisCycle || 0}</span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-1.5 sm:h-2 mb-1.5 sm:mb-2 overflow-hidden">
-            <div className="bg-blue-600 h-full rounded-full" style={{ width: `${Math.min(100, ((dashboardStats?.bottlesReceivedThisCycle || 0) / Math.max(1, (customer?.bottlesPerDelivery * 4) || 20)) * 100)}%` }}></div>
+          <div className="w-full bg-gray-100 rounded-full h-2 sm:h-2.5 mb-2 overflow-hidden shadow-inner">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all duration-500" style={{ width: `${Math.min(100, ((dashboardStats?.bottlesReceivedThisCycle || 0) / Math.max(1, (customer?.bottlesPerDelivery * 4) || 20)) * 100)}%` }}></div>
           </div>
-          <p className="text-[10px] sm:text-xs text-gray-400 font-medium">Resets on {dashboardStats?.nextInvoiceDate ? new Date(dashboardStats.nextInvoiceDate).toLocaleDateString() : 'Next Cycle'}</p>
+          <p className="text-[10px] sm:text-xs text-gray-400 font-medium">Resets on <span className="font-bold text-gray-500">{dashboardStats?.nextInvoiceDate ? new Date(dashboardStats.nextInvoiceDate).toLocaleDateString() : 'Next Cycle'}</span></p>
         </div>
         
         {/* Outstanding Dues */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-center">
-          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0 ${customer?.outstandingDues > 0 ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'}`}>
-              <Receipt className="w-4 h-4 sm:w-5 sm:h-5" />
+        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col justify-center hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow">
+          <div className="flex items-center gap-3 mb-3 sm:mb-4">
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 border ${customer?.outstandingDues > 0 ? 'bg-red-50/50 text-red-600 border-red-100/50' : 'bg-emerald-50/50 text-emerald-600 border-emerald-100/50'}`}>
+              <Receipt className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <p className="text-xs sm:text-sm text-gray-500 font-bold uppercase tracking-wider">Outstanding Dues</p>
+            <p className="text-xs sm:text-sm text-gray-500 font-bold uppercase tracking-wider">Outstanding</p>
           </div>
-          <p className={`text-base sm:text-2xl font-black leading-tight ${customer?.outstandingDues > 0 ? 'text-red-600' : 'text-emerald-600'}`}>PKR {customer?.outstandingDues || 0}</p>
+          <p className={`text-xl sm:text-3xl font-black leading-tight drop-shadow-sm ${customer?.outstandingDues > 0 ? 'text-red-600' : 'text-emerald-600'}`}>PKR {customer?.outstandingDues || 0}</p>
           <p className="text-[10px] sm:text-xs text-gray-500 font-medium mt-1">
-            {customer?.outstandingDues > 0 ? 'Please clear your dues' : 'All clear!'}
+            {customer?.outstandingDues > 0 ? 'Please clear your dues' : 'All clear! No pending payments.'}
           </p>
         </div>
 
         {/* Pricing Info */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm flex flex-col justify-center">
-          <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-50 text-emerald-600 rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
-              <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
+        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col justify-center hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-shadow">
+          <div className="flex items-center gap-3 mb-3 sm:mb-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-indigo-50/50 text-indigo-600 rounded-2xl flex items-center justify-center shrink-0 border border-indigo-100/50">
+              <CreditCard className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <p className="text-xs sm:text-sm text-gray-500 font-bold uppercase tracking-wider">Price</p>
+            <p className="text-xs sm:text-sm text-gray-500 font-bold uppercase tracking-wider">Rate</p>
           </div>
-          <p className="text-lg sm:text-2xl font-black text-gray-900 leading-tight">PKR {customer?.bottlePrice || 0} <span className="text-xs sm:text-sm font-bold text-gray-400">/ea</span></p>
+          <p className="text-xl sm:text-3xl font-black text-gray-900 leading-tight drop-shadow-sm">PKR {customer?.bottlePrice || 0} <span className="text-sm font-bold text-gray-400">/ea</span></p>
+          <p className="text-[10px] sm:text-xs text-gray-400 font-medium mt-1">Your locked-in unit price.</p>
         </div>
       </div>
 
       {/* Assigned Team */}
-      <div className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-100 shadow-sm">
-        <h3 className="font-bold text-gray-800 text-sm sm:text-base mb-3 flex items-center gap-2">
-          <User className="text-blue-500 w-4 h-4 sm:w-5 sm:h-5" /> {t("assigned_team")}
+      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <h3 className="font-bold text-gray-900 text-sm sm:text-base mb-4 flex items-center gap-2">
+          <User className="text-blue-500 w-5 h-5" /> {t("assigned_team")}
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-          <div className="p-3 sm:p-4 bg-gray-50 border border-gray-100 rounded-xl flex items-center gap-3">
-             <div className="w-10 h-10 bg-white rounded-full shadow-sm flex items-center justify-center font-bold text-blue-600">S</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-4 sm:p-5 bg-gray-50/50 border border-gray-100 rounded-2xl flex items-center gap-4 hover:shadow-sm transition-shadow">
+             <div className="w-12 h-12 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center font-black text-blue-600 text-lg">
+               {(customer?.supplierId?.businessName || 'S').charAt(0).toUpperCase()}
+             </div>
              <div>
-               <p className="text-[10px] sm:text-xs text-gray-500 font-bold uppercase tracking-wider mb-0.5">{t("water_supplier")}</p>
-               <p className="font-bold text-gray-900 text-sm sm:text-base">{customer?.supplierId?.businessName || 'AquaFlow Hub'}</p>
-               <p className="text-xs text-gray-500">{customer?.supplierId?.supportPhone || 'N/A'}</p>
+               <p className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider mb-0.5">{t("water_supplier")}</p>
+               <p className="font-black text-gray-900 text-sm sm:text-base">{customer?.supplierId?.businessName || 'AquaFlow Hub'}</p>
+               <p className="text-xs text-gray-500 font-medium">{customer?.supplierId?.supportPhone || 'N/A'}</p>
              </div>
           </div>
 
           {rider ? (
-            <div className="p-3 sm:p-4 bg-green-50/50 border border-green-100 rounded-xl flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <img src={`https://ui-avatars.com/api/?name=${rider.name}&background=16a34a&color=fff`} className="w-10 h-10 rounded-full shadow-sm" alt="Rider" />
+            <div className="p-4 sm:p-5 bg-emerald-50/30 border border-emerald-100 rounded-2xl flex items-center justify-between gap-4 hover:shadow-sm transition-shadow">
+              <div className="flex items-center gap-4">
+                <img src={`https://ui-avatars.com/api/?name=${rider.name}&background=10b981&color=fff&rounded=true&bold=true`} className="w-12 h-12 rounded-2xl shadow-sm border border-emerald-100" alt="Rider" />
                 <div>
-                  <p className="text-[10px] sm:text-xs text-green-600 font-bold uppercase tracking-wider mb-0.5">{t("assigned_rider")}</p>
-                  <p className="font-bold text-gray-900 text-sm sm:text-base">{rider.name}</p>
+                  <p className="text-[10px] sm:text-xs text-emerald-600 font-bold uppercase tracking-wider mb-0.5">{t("assigned_rider")}</p>
+                  <p className="font-black text-gray-900 text-sm sm:text-base">{rider.name}</p>
                 </div>
               </div>
               <a 
                 href={`https://wa.me/${rider.phone.replace(/[^0-9]/g, '')}`} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center shadow-sm transition-all shrink-0"
+                className="w-12 h-12 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl flex items-center justify-center shadow-md shadow-emerald-500/20 transition-all shrink-0 hover:scale-105 active:scale-95"
               >
-                <Phone className="w-4 h-4" />
+                <Phone className="w-5 h-5" />
               </a>
             </div>
           ) : (
-            <div className="p-3 sm:p-4 bg-gray-50 border border-gray-100 border-dashed rounded-xl flex items-center justify-center text-gray-400 text-sm font-medium">
+            <div className="p-4 sm:p-5 bg-gray-50 border border-gray-100 border-dashed rounded-2xl flex items-center justify-center text-gray-400 text-sm font-medium">
               {t("no_rider_assigned")}
             </div>
           )}
@@ -267,22 +275,22 @@ export function CustomerDashboard({ activeTab }) {
 
       {/* Recent Invoices Mini-Table */}
       {invoices.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-4 py-3 sm:px-5 sm:py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-            <h3 className="font-bold text-gray-800 text-sm sm:text-base flex items-center gap-2">
-              <Receipt className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500" /> Recent Generated Invoices
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+          <div className="px-5 py-4 sm:px-6 sm:py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
+            <h3 className="font-bold text-gray-900 text-sm sm:text-base flex items-center gap-2">
+              <Receipt className="w-5 h-5 text-indigo-500" /> Recent Generated Invoices
             </h3>
           </div>
           <div className="divide-y divide-gray-50">
             {invoices.slice(0, 3).map(inv => (
-              <div key={inv._id} className="p-3 sm:p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+              <div key={inv._id} className="p-4 sm:p-5 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
                 <div>
                   <p className="font-bold text-gray-900 text-sm sm:text-base">{new Date(inv.createdAt || inv.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                  <p className="text-[10px] sm:text-xs text-gray-500 font-medium">{inv.totalBottles} bottles @ PKR {inv.bottlePrice}</p>
+                  <p className="text-[10px] sm:text-xs text-gray-500 font-medium mt-0.5">{inv.totalBottles} bottles @ PKR {inv.bottlePrice}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-black text-gray-900 text-sm sm:text-base">PKR {inv.totalAmount}</p>
-                  <div className={`inline-flex px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold uppercase mt-0.5 sm:mt-1 ${inv.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>
+                  <p className="font-black text-gray-900 text-sm sm:text-base drop-shadow-sm">PKR {inv.totalAmount}</p>
+                  <div className={`inline-flex px-2 py-1 rounded-lg text-[9px] sm:text-[10px] font-bold uppercase tracking-wider mt-1 border ${inv.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100'}`}>
                     {inv.paymentStatus}
                   </div>
                 </div>
@@ -401,79 +409,135 @@ export function CustomerDashboard({ activeTab }) {
     );
   };
 
-  const renderOrderHistory = () => (
-    <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden animate-fadeIn max-w-5xl mx-auto">
-      <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-        <h2 className="text-xl font-bold text-gray-800">{t("order_registry")}</h2>
-        <p className="text-sm text-gray-500 mt-1">{t("track_status")}</p>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-left">
-          <thead className="bg-white border-b border-gray-100">
-            <tr>
-              <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">{t("date")}</th>
-              <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">{t("order_details")}</th>
-              <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">{t("amount")}</th>
-              <th className="px-8 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">{t("status")}</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {orders.length === 0 ? (
-              <tr>
-                <td colSpan="4" className="px-8 py-16 text-center text-gray-400">
-                  <Package className="w-12 h-12 mx-auto mb-3 text-gray-200" />
-                  <p className="text-base font-bold text-gray-600">{t("no_past_orders")}</p>
-                  <p className="text-sm">{t("place_order_hint")}</p>
-                </td>
-              </tr>
-            ) : (
-              orders.map(order => (
-                <tr key={order._id} className="hover:bg-gray-50/50 transition-colors">
-                  <td className="px-8 py-5 whitespace-nowrap">
-                    <p className="font-bold text-gray-900">{new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                    <p className="text-xs text-gray-500 font-medium">{new Date(order.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
-                  </td>
-                  <td className="px-8 py-5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
-                        {order.quantity}x
-                      </div>
-                      <div>
-                        <p className="font-bold text-gray-800">{order.productType}</p>
-                        <p className="text-xs text-gray-500 font-medium capitalize">{t("slot")}: {order.timeSlot}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-5 whitespace-nowrap">
-                    <p className="font-bold text-gray-900">PKR {order.totalAmount}</p>
-                    <p className="text-xs text-gray-500 font-medium uppercase">{order.paymentMethod}</p>
-                  </td>
-                  <td className="px-8 py-5 text-right whitespace-nowrap">
-                    <div className={`inline-flex px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
-                      order.status === 'completed' ? 'bg-blue-50 text-blue-600 border border-blue-100' :
-                      order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 
-                      order.status === 'failed' ? 'bg-red-50 text-red-600 border border-red-100' :
-                      'bg-amber-50 text-amber-600 border border-amber-100'
-                    }`}>
-                      {order.status}
-                    </div>
-                    {order.status === 'delivered' && (
-                      <button 
-                        onClick={() => handleConfirmReceipt(order._id)}
-                        className="mt-2 block w-full text-center bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg transition-colors"
-                      >
-                        Confirm Receipt
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))
+  const renderOrderHistory = () => {
+    // Generate unique years
+    const uniqueYears = [...new Set(orders.map(o => new Date(o.createdAt).getFullYear()))].sort().reverse();
+    
+    // Generate months (0-11)
+    const months = Array.from({ length: 12 }).map((_, i) => ({
+      value: i.toString(),
+      label: new Date(2000, i, 1).toLocaleString(language === 'ur' ? 'ur-PK' : 'en-US', { month: 'long' })
+    }));
+
+    const filteredOrders = orders.filter(o => {
+      const d = new Date(o.createdAt);
+      const matchYear = filterYear === 'all' || d.getFullYear().toString() === filterYear;
+      const matchMonth = filterMonth === 'all' || d.getMonth().toString() === filterMonth;
+      return matchYear && matchMonth;
+    });
+
+    return (
+      <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden animate-fadeIn max-w-5xl mx-auto">
+        <div className="px-5 py-5 sm:px-8 sm:py-6 border-b border-gray-100 bg-gray-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold text-gray-800">{t("order_registry")}</h2>
+            <p className="text-sm text-gray-500 mt-1">{t("track_status")}</p>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+            {uniqueYears.length > 0 && (
+              <select 
+                value={filterYear}
+                onChange={(e) => setFilterYear(e.target.value)}
+                className="w-full sm:w-auto border-2 border-gray-200 rounded-xl px-4 py-2 sm:py-2.5 bg-white text-sm font-bold text-gray-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all shadow-sm"
+              >
+                <option value="all">All Years</option>
+                {uniqueYears.map(y => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
             )}
-          </tbody>
-        </table>
+            <select 
+              value={filterMonth}
+              onChange={(e) => setFilterMonth(e.target.value)}
+              className="w-full sm:w-auto border-2 border-gray-200 rounded-xl px-4 py-2 sm:py-2.5 bg-white text-sm font-bold text-gray-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all shadow-sm"
+            >
+              <option value="all">All Months</option>
+              {months.map(m => (
+                <option key={m.value} value={m.value}>{m.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="divide-y divide-gray-100">
+          {filteredOrders.length === 0 ? (
+            <div className="px-8 py-16 text-center text-gray-400">
+              <Package className="w-12 h-12 mx-auto mb-3 text-gray-200" />
+              <p className="text-base font-bold text-gray-600">No orders found for this selection.</p>
+            </div>
+          ) : (
+            filteredOrders.map(order => (
+              <div key={order._id} className="p-5 sm:p-6 hover:bg-gray-50/50 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              
+              {/* Header: Date & Status (Mobile) */}
+              <div className="flex justify-between items-start sm:w-1/4">
+                <div>
+                  <p className="font-bold text-gray-900 text-sm sm:text-base">{new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                  <p className="text-xs text-gray-500 font-medium">{new Date(order.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
+                </div>
+                
+                {/* Mobile Status */}
+                <div className="sm:hidden">
+                  <div className={`inline-flex px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${
+                    order.status === 'completed' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                    order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
+                    order.status === 'failed' ? 'bg-red-50 text-red-600 border-red-100' :
+                    'bg-amber-50 text-amber-600 border-amber-100'
+                  }`}>
+                    {order.status}
+                  </div>
+                </div>
+              </div>
+
+              {/* Middle: Details */}
+              <div className="flex items-center gap-3 sm:w-1/3">
+                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-black text-lg shadow-sm border border-blue-100/50 shrink-0">
+                  {order.quantity}x
+                </div>
+                <div>
+                  <p className="font-bold text-gray-800 text-sm sm:text-base">{order.productType}</p>
+                  <p className="text-xs text-gray-500 font-medium capitalize">{t("slot")}: {order.timeSlot}</p>
+                </div>
+              </div>
+
+              {/* Bottom/Right: Amount & Status Desktop */}
+              <div className="flex justify-between items-center sm:w-1/3 sm:justify-end gap-6 border-t border-gray-100 sm:border-t-0 pt-4 sm:pt-0 mt-2 sm:mt-0">
+                <div className="sm:text-right">
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-0.5 sm:hidden">{t("amount")}</p>
+                  <p className="font-black text-gray-900 text-lg sm:text-base">PKR {order.totalAmount}</p>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">{order.paymentMethod}</p>
+                </div>
+                
+                {/* Desktop Status */}
+                <div className="hidden sm:block text-right">
+                  <div className={`inline-flex px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border shadow-sm ${
+                    order.status === 'completed' ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                    order.status === 'delivered' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
+                    order.status === 'failed' ? 'bg-red-50 text-red-600 border-red-100' :
+                    'bg-amber-50 text-amber-600 border-amber-100'
+                  }`}>
+                    {order.status}
+                  </div>
+                </div>
+              </div>
+
+              {/* Action */}
+              {order.status === 'delivered' && (
+                <div className="w-full sm:w-auto mt-2 sm:mt-0">
+                  <button 
+                    onClick={() => handleConfirmReceipt(order._id)}
+                    className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-colors shadow-sm"
+                  >
+                    Confirm Receipt
+                  </button>
+                </div>
+              )}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
+  };
 
   const renderBilling = () => {
     // 1. Calculate Unpaid Invoices Total (Arrears)
