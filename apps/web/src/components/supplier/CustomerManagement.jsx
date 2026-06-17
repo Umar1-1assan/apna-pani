@@ -172,13 +172,13 @@ export function CustomerManagement({ customers, riders, onAddCustomer, onUpdateC
                     </td>
                     <td className="px-6 py-4 text-center">
                       <div className="flex flex-col items-center">
-                        <span className="font-bold text-gray-900 text-sm">₨ {c.bottlePrice} <span className="text-[10px] text-gray-500 font-normal">/btl</span></span>
+                        <span className="font-bold text-gray-900 text-sm">PKR {c.bottlePrice} <span className="text-[10px] text-gray-500 font-normal">/btl</span></span>
                         <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider bg-emerald-50 border border-emerald-100 px-2 py-0.5 rounded mt-1">
                           {c.billingCycle || 'monthly'}
                         </span>
                         {c.walletBalance !== 0 && (
                           <span className={`text-[10px] font-bold mt-1 ${c.walletBalance > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            Bal: ₨ {c.walletBalance}
+                            Bal: PKR {c.walletBalance}
                           </span>
                         )}
                       </div>

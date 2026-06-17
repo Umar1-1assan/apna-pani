@@ -130,7 +130,7 @@ export function RiderDeliveryHistory() {
                       </div>
                     </div>
                     <div className="text-right shrink-0 ml-3">
-                      <p className="font-bold text-gray-900 text-sm">₨ {order.totalAmount}</p>
+                      <p className="font-bold text-gray-900 text-sm">PKR {order.totalAmount}</p>
                       <p className="text-[10px] text-gray-500 font-medium">{order.paymentMethod}</p>
                     </div>
                   </div>

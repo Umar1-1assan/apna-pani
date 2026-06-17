@@ -76,7 +76,7 @@ export function RiderOverview({
           <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center mx-auto mb-3">
             <Banknote className="w-5 h-5 text-emerald-600" />
           </div>
-          <p className="text-2xl font-black text-gray-900 leading-none mt-1">₨ {eodSummary?.totalCashCollected || 0}</p>
+          <p className="text-2xl font-black text-gray-900 leading-none mt-1">PKR {eodSummary?.totalCashCollected || 0}</p>
           <p className="text-[11px] text-gray-500 font-bold mt-2 uppercase tracking-wider">{t('stat_cash')}</p>
         </div>
         <div className="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm text-center">

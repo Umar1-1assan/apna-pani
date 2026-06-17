@@ -167,7 +167,7 @@ export function InvoicesManagement({ customers, invoices = [], loadInvoices, onG
                     <p className="text-gray-700 font-medium">{inv.period}</p>
                   </td>
                   <td className="px-6 py-4">
-                    <p className="font-bold text-gray-900">₨ {inv.amount.toLocaleString()}</p>
+                    <p className="font-bold text-gray-900">PKR {inv.amount.toLocaleString()}</p>
                   </td>
                   <td className="px-6 py-4">
                     {inv.status === "Paid" && (

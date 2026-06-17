@@ -206,7 +206,7 @@ export function CustomerDashboard({ activeTab }) {
             </div>
             <p className="text-xs sm:text-sm text-gray-500 font-bold uppercase tracking-wider">Outstanding Dues</p>
           </div>
-          <p className={`text-base sm:text-2xl font-black leading-tight ${customer?.outstandingDues > 0 ? 'text-red-600' : 'text-emerald-600'}`}>₨ {customer?.outstandingDues || 0}</p>
+          <p className={`text-base sm:text-2xl font-black leading-tight ${customer?.outstandingDues > 0 ? 'text-red-600' : 'text-emerald-600'}`}>PKR {customer?.outstandingDues || 0}</p>
           <p className="text-[10px] sm:text-xs text-gray-500 font-medium mt-1">
             {customer?.outstandingDues > 0 ? 'Please clear your dues' : 'All clear!'}
           </p>
@@ -220,7 +220,7 @@ export function CustomerDashboard({ activeTab }) {
             </div>
             <p className="text-xs sm:text-sm text-gray-500 font-bold uppercase tracking-wider">Price</p>
           </div>
-          <p className="text-lg sm:text-2xl font-black text-gray-900 leading-tight">₨ {customer?.bottlePrice || 0} <span className="text-xs sm:text-sm font-bold text-gray-400">/ea</span></p>
+          <p className="text-lg sm:text-2xl font-black text-gray-900 leading-tight">PKR {customer?.bottlePrice || 0} <span className="text-xs sm:text-sm font-bold text-gray-400">/ea</span></p>
         </div>
       </div>
 
@@ -278,10 +278,10 @@ export function CustomerDashboard({ activeTab }) {
               <div key={inv._id} className="p-3 sm:p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
                 <div>
                   <p className="font-bold text-gray-900 text-sm sm:text-base">{new Date(inv.createdAt || inv.updatedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                  <p className="text-[10px] sm:text-xs text-gray-500 font-medium">{inv.totalBottles} bottles @ ₨{inv.bottlePrice}</p>
+                  <p className="text-[10px] sm:text-xs text-gray-500 font-medium">{inv.totalBottles} bottles @ PKR {inv.bottlePrice}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-black text-gray-900 text-sm sm:text-base">₨ {inv.totalAmount}</p>
+                  <p className="font-black text-gray-900 text-sm sm:text-base">PKR {inv.totalAmount}</p>
                   <div className={`inline-flex px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold uppercase mt-0.5 sm:mt-1 ${inv.paymentStatus === 'paid' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'}`}>
                     {inv.paymentStatus}
                   </div>
@@ -317,7 +317,7 @@ export function CustomerDashboard({ activeTab }) {
                 <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
                 <div>
                   <h4 className="font-bold text-red-800 text-sm">Action Required: Outstanding Dues</h4>
-                  <p className="text-red-600 text-xs mt-1">Your outstanding balance has exceeded ₨ 500. Please clear your dues from the Billing tab to continue requesting new deliveries.</p>
+                  <p className="text-red-600 text-xs mt-1">Your outstanding balance has exceeded PKR 500. Please clear your dues from the Billing tab to continue requesting new deliveries.</p>
                 </div>
               </div>
             )}
@@ -388,8 +388,8 @@ export function CustomerDashboard({ activeTab }) {
             <div className="mt-10 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-6">
               <div>
                 <p className="text-sm font-bold text-gray-500 uppercase">{t("total_payable")}</p>
-                <p className="text-3xl font-black text-blue-600">₨ {totalCalc}</p>
-                <p className="text-xs text-gray-400 font-medium">({orderForm.quantity} x ₨{customer?.bottlePrice})</p>
+                <p className="text-3xl font-black text-blue-600">PKR {totalCalc}</p>
+                <p className="text-xs text-gray-400 font-medium">({orderForm.quantity} x PKR {customer?.bottlePrice})</p>
               </div>
               <button type="submit" disabled={submitting || (customer?.outstandingDues > 500)} className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black text-lg rounded-xl shadow-lg shadow-blue-200 transition-all disabled:opacity-70 disabled:bg-gray-400 disabled:shadow-none flex items-center justify-center gap-2">
                 {submitting ? '...' : t("submit_order_request")} <Check className="w-5 h-5" />
@@ -445,7 +445,7 @@ export function CustomerDashboard({ activeTab }) {
                     </div>
                   </td>
                   <td className="px-8 py-5 whitespace-nowrap">
-                    <p className="font-bold text-gray-900">₨ {order.totalAmount}</p>
+                    <p className="font-bold text-gray-900">PKR {order.totalAmount}</p>
                     <p className="text-xs text-gray-500 font-medium uppercase">{order.paymentMethod}</p>
                   </td>
                   <td className="px-8 py-5 text-right whitespace-nowrap">
@@ -510,7 +510,7 @@ export function CustomerDashboard({ activeTab }) {
                 <AlertTriangle className="w-24 h-24 text-red-600" />
               </div>
               <h3 className="text-sm font-bold text-red-600 tracking-wider uppercase mb-2 relative z-10">Outstanding Arrears</h3>
-              <p className="text-4xl font-black text-red-700 relative z-10">₨ {unpaidTotal.toLocaleString()}</p>
+              <p className="text-4xl font-black text-red-700 relative z-10">PKR {unpaidTotal.toLocaleString()}</p>
               <p className="text-sm text-red-600/80 mt-2 font-medium relative z-10">From previously generated unpaid invoices.</p>
             </div>
 
@@ -520,7 +520,7 @@ export function CustomerDashboard({ activeTab }) {
                 <Package className="w-24 h-24 text-emerald-600" />
               </div>
               <h3 className="text-sm font-bold text-emerald-600 tracking-wider uppercase mb-2 relative z-10">Current Cycle Accrued</h3>
-              <p className="text-4xl font-black text-emerald-700 relative z-10">₨ {unbilledAmount.toLocaleString()}</p>
+              <p className="text-4xl font-black text-emerald-700 relative z-10">PKR {unbilledAmount.toLocaleString()}</p>
               <p className="text-sm text-emerald-600/80 mt-2 font-medium relative z-10">
                 {unbilledBottles} bottles delivered so far this cycle.
               </p>
@@ -556,10 +556,10 @@ export function CustomerDashboard({ activeTab }) {
                     </div>
                     <div className="pl-2">
                       <p className="text-sm text-gray-500">{t("amount_due_paid")}</p>
-                      <p className="text-2xl font-black text-gray-900">₨ {inv.totalAmount}</p>
+                      <p className="text-2xl font-black text-gray-900">PKR {inv.totalAmount}</p>
                       <div className="mt-4 text-xs text-gray-500 bg-gray-50 rounded-lg p-3 mb-4">
                         <p className="flex justify-between"><span>{t("bottles")}:</span> <span className="font-bold">{inv.totalBottles}</span></p>
-                        <p className="flex justify-between mt-1"><span>{t("rate")}</span> <span className="font-bold">₨ {inv.bottlePrice}</span></p>
+                        <p className="flex justify-between mt-1"><span>{t("rate")}</span> <span className="font-bold">PKR {inv.bottlePrice}</span></p>
                       </div>
                       
                       {inv.paymentStatus !== 'paid' && inv.paymentStatus !== 'pending_confirmation' && (

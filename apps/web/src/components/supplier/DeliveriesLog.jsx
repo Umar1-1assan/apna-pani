@@ -217,7 +217,7 @@ export function DeliveriesLog({ riders, supplierProfile, onUpdateSupplierProfile
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="font-bold text-gray-900">₨ {(o.totalAmount || 0)}</p>
+                      <p className="font-bold text-gray-900">PKR {(o.totalAmount || 0)}</p>
                       {o.paymentMethod === 'Billed_Later' && (
                         <div className="mt-1">
                           <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200 uppercase">
@@ -368,7 +368,7 @@ export function DeliveriesLog({ riders, supplierProfile, onUpdateSupplierProfile
           </div>
           <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 shadow-sm">
             <p className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Expected Revenue</p>
-            <h3 className="text-2xl font-black text-blue-900">₨ {totalRevenue.toFixed(2)}</h3>
+            <h3 className="text-2xl font-black text-blue-900">PKR {totalRevenue.toFixed(2)}</h3>
           </div>
         </div>
       )}

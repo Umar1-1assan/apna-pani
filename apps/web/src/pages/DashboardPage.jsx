@@ -216,14 +216,18 @@ export function DashboardPage() {
 
       {/* ─── MAIN CONTENT WORKSPACE (main) ─── */}
       <main className="flex-1 min-w-0 w-full max-w-full overflow-x-hidden md:ml-64 flex flex-col min-h-screen pb-24 md:pb-6 bg-[#f8f9ff]">
-        {/* Workspace Top Header */}
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full px-6 py-6 border-b border-[#eff4ff] bg-white gap-4">
+        {/* Workspace Top Header (Desktop) */}
+        <header className="hidden md:flex justify-between items-center w-full px-6 py-6 border-b border-[#eff4ff] bg-white gap-4">
           <div>
-            <h2 className="text-lg font-bold text-gray-800 leading-none">{t('logistics_console')}</h2>
-            <p className="text-xs text-gray-400 mt-1.5">{t('welcome_back_cockpit')}</p>
+            <h2 className="text-lg font-bold text-gray-800 leading-none">
+              {role === 'customer' ? 'Customer Dashboard' : role === 'delivery_boy' ? 'Rider Dashboard' : t('logistics_console')}
+            </h2>
+            <p className="text-xs text-gray-400 mt-1.5">
+              {role === 'customer' ? 'Manage your water deliveries' : role === 'delivery_boy' ? 'Manage your assigned route' : t('welcome_back_cockpit')}
+            </p>
           </div>
 
-          <div className="flex items-center gap-3 self-stretch sm:self-auto justify-between sm:justify-start">
+          <div className="flex items-center gap-3">
             {/* Current dynamic date */}
             <span className="inline-flex items-center gap-1.5 bg-[#eff4ff] px-3.5 py-1 rounded-full text-xs font-bold text-[#0058bf] border border-[#dce9ff]">
               <CalendarDays size={14} /> {currentDate || "Loading date..."}
@@ -231,6 +235,29 @@ export function DashboardPage() {
             <button
               onClick={() => setShowProfileModal(true)}
               className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 font-bold text-sm flex items-center justify-center shadow-inner hover:bg-blue-200 transition-colors"
+            >
+              {initials}
+            </button>
+          </div>
+        </header>
+
+        {/* Mobile Topbar (Small/Medium Devices) */}
+        <header className="md:hidden sticky top-0 z-30 bg-white/90 backdrop-blur-lg border-b border-gray-100 shadow-sm px-4 py-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Logo size={32} showText={false} />
+            <div className="flex flex-col">
+              <h2 className="text-base font-black text-gray-900 leading-none tracking-tight">
+                {role === 'customer' ? 'AquaFlow' : role === 'delivery_boy' ? 'Rider App' : 'AquaFlow Admin'}
+              </h2>
+              <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">
+                {roleLabel[role] ?? role}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowProfileModal(true)}
+              className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-md ring-2 ring-white/50 active:scale-95 transition-transform"
             >
               {initials}
             </button>

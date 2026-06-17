@@ -68,12 +68,12 @@ export function RiderCashCollection() {
           
           <div className="relative">
             <p className="text-indigo-100 text-xs font-bold uppercase tracking-wider mb-1">{t('total_pending_collection')}</p>
-            <h2 className="text-4xl font-black leading-none mb-4">₨ {totalPending.toLocaleString()}</h2>
+            <h2 className="text-4xl font-black leading-none mb-4">PKR {totalPending.toLocaleString()}</h2>
             
             <div className="bg-white/15 backdrop-blur-sm px-4 py-3 rounded-xl flex items-center justify-between mb-3">
               <div>
                 <p className="text-[11px] text-indigo-200 font-bold uppercase">{t('cash_collected_in_hand')}</p>
-                <p className="text-xl font-black text-emerald-300">₨ {cashInHand.toLocaleString()}</p>
+                <p className="text-xl font-black text-emerald-300">PKR {cashInHand.toLocaleString()}</p>
               </div>
               <Wallet className="w-8 h-8 text-emerald-300 opacity-80" />
             </div>
@@ -125,7 +125,7 @@ export function RiderCashCollection() {
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <span className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 uppercase border border-amber-100">
-                          {t('due')}: ₨ {inv.totalAmount}
+                          {t('due')}: PKR {inv.totalAmount}
                         </span>
                         <span className="text-[10px] text-gray-400 font-medium">{t('generated')}: {new Date(inv.createdAt).toLocaleDateString()}</span>
                       </div>

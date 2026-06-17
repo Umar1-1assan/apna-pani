@@ -73,7 +73,7 @@ export function RiderRoute({
                                 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
                                 : 'bg-blue-50 text-blue-700 border border-blue-200'
                             }`}>
-                              <Banknote className="w-3.5 h-3.5" /> ₨ {order.totalAmount} ({order.paymentMethod})
+                              <Banknote className="w-3.5 h-3.5" /> PKR {order.totalAmount} ({order.paymentMethod})
                             </span>
                           )}
                         </div>
@@ -160,7 +160,7 @@ export function RiderRoute({
                 </div>
                 <div className="text-right shrink-0 ml-4">
                   <span className="inline-flex px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-50 text-amber-600 border border-amber-200">Pending</span>
-                  <p className="text-sm font-bold mt-2 text-gray-600">₨ {order.totalAmount}</p>
+                  <p className="text-sm font-bold mt-2 text-gray-600">PKR {order.totalAmount}</p>
                 </div>
               </div>
             ))}
@@ -184,7 +184,7 @@ export function RiderRoute({
                 </div>
                 <div className="text-right shrink-0 ml-4">
                   <StatusPill status={order.status} />
-                  <p className="text-sm font-bold mt-2 text-gray-600">₨ {order.totalAmount}</p>
+                  <p className="text-sm font-bold mt-2 text-gray-600">PKR {order.totalAmount}</p>
                 </div>
               </div>
             ))}

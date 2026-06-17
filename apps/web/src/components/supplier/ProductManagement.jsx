@@ -201,7 +201,7 @@ export function ProductManagement() {
                   <div>
                     <h3 className="text-lg font-extrabold text-gray-900 leading-tight">{product.name}</h3>
                     <div className="flex items-center gap-1.5 mt-2 bg-blue-50 text-blue-800 font-black text-base px-2.5 py-1 rounded-lg border border-blue-100 shadow-sm w-fit">
-                      <span>₨ {product.price}</span>
+                      <span>PKR {product.price}</span>
                     </div>
                   </div>
 

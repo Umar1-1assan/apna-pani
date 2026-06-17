@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuthStore } from "../store/authStore";
+import { Eye, EyeOff } from "lucide-react";
 
 import { Logo } from "../components/Logo";
 
@@ -30,6 +31,7 @@ export function LoginPage() {
   // Login form state
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
 
   // Forgot password state
   const [resetEmail, setResetEmail] = useState("");
@@ -80,13 +82,19 @@ export function LoginPage() {
       navigate("/dashboard");
     } catch (err) {
       // Detailed error for debugging mobile connectivity
-      let errorMsg = "";
+      let errorMsg = "An unexpected error occurred. Please try again.";
       if (err.response) {
         // Server responded with an error status
-        errorMsg = err.response.data?.message || `Server error (${err.response.status})`;
+        if (err.response.status === 429) {
+          errorMsg = "Too many login attempts. Please try again later.";
+        } else if (typeof err.response.data === "string") {
+          errorMsg = err.response.data;
+        } else {
+          errorMsg = err.response.data?.message || `Server error (${err.response.status})`;
+        }
       } else if (err.request) {
         // Request was made but no response received (network issue)
-        errorMsg = `Network error: Cannot reach server. Check if backend is running and accessible from this device. (${err.message})`;
+        errorMsg = `Network error: Cannot reach server. Check if backend is running and accessible from this device.`;
       } else {
         // Something else went wrong
         errorMsg = `Request setup error: ${err.message}`;
@@ -257,14 +265,23 @@ export function LoginPage() {
                         Forgot Password?
                       </button>
                     </div>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter your password"
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 placeholder-gray-400 transition-colors bg-white"
-                      required
-                    />
+                    <div className="relative">
+                      <input
+                        type={showLoginPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter your password"
+                        className="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none text-gray-800 placeholder-gray-400 transition-colors bg-white"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowLoginPassword(!showLoginPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                      >
+                        {showLoginPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                      </button>
+                    </div>
                   </div>
 
                   <button
@@ -275,11 +292,6 @@ export function LoginPage() {
                     {loading ? "Authenticating..." : "Login"}
                   </button>
                 </form>
-
-                {/* verified badge at bottom of form */}
-                <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-blue-600 bg-blue-50/50 py-2.5 rounded-xl mt-5 border border-blue-100/30">
-                  <span className="text-sm">✓</span> Your email is verified
-                </div>
               </>
             )}
 
@@ -361,9 +373,9 @@ export function LoginPage() {
                       <button
                         type="button"
                         onClick={() => setShowPassword1(!showPassword1)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
                       >
-                        {showPassword1 ? "🙈" : "👁"}
+                        {showPassword1 ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
                     </div>
                   </div>
@@ -382,9 +394,9 @@ export function LoginPage() {
                       <button
                         type="button"
                         onClick={() => setShowPassword2(!showPassword2)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
                       >
-                        {showPassword2 ? "🙈" : "👁"}
+                        {showPassword2 ? <EyeOff size={20} /> : <Eye size={20} />}
                       </button>
                     </div>
                   </div>

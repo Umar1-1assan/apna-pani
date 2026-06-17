@@ -163,8 +163,8 @@ function InvoiceContent({ invoice, customerName, customerPhone, customerAddress,
               <p className="text-xs text-gray-500 mt-1">19L standard bottles delivered between {startDate} and {endDate}</p>
             </td>
             <td className="py-6 text-center font-bold text-gray-800">{invoice.totalBottles || 0}</td>
-            <td className="py-6 text-right text-gray-800">₨ {invoice.bottlePrice || 0}</td>
-            <td className="py-6 text-right font-bold text-gray-900">₨ {((invoice.totalBottles || 0) * (invoice.bottlePrice || 0)).toLocaleString()}</td>
+            <td className="py-6 text-right text-gray-800">PKR {invoice.bottlePrice || 0}</td>
+            <td className="py-6 text-right font-bold text-gray-900">PKR {((invoice.totalBottles || 0) * (invoice.bottlePrice || 0)).toLocaleString()}</td>
           </tr>
         </tbody>
       </table>
@@ -186,7 +186,7 @@ function InvoiceContent({ invoice, customerName, customerPhone, customerAddress,
                 <tr key={idx} className="border-b border-gray-50">
                   <td className="py-4 text-sm font-bold text-gray-800">#{arrear.invoiceStringId}</td>
                   <td className="py-4 text-sm text-gray-600 text-center">{arrear.period}</td>
-                  <td className="py-4 text-sm font-bold text-red-600 text-right">₨ {arrear.amountDue.toLocaleString()}</td>
+                  <td className="py-4 text-sm font-bold text-red-600 text-right">PKR {arrear.amountDue.toLocaleString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -199,23 +199,23 @@ function InvoiceContent({ invoice, customerName, customerPhone, customerAddress,
         <div className="w-72">
           <div className="flex justify-between py-2 border-b border-gray-200">
             <span className="text-sm font-semibold text-gray-600">Subtotal</span>
-            <span className="text-sm font-bold text-gray-900">₨ {((invoice.totalBottles || 0) * (invoice.bottlePrice || 0)).toLocaleString()}</span>
+            <span className="text-sm font-bold text-gray-900">PKR {((invoice.totalBottles || 0) * (invoice.bottlePrice || 0)).toLocaleString()}</span>
           </div>
           <div className="flex justify-between py-2 border-b border-gray-200">
             <span className="text-sm font-semibold text-gray-600">Tax</span>
-            <span className="text-sm font-bold text-gray-900">₨ 0</span>
+            <span className="text-sm font-bold text-gray-900">PKR 0</span>
           </div>
           
           {invoice.previousDues > 0 && (
             <div className="flex justify-between py-2 border-b border-gray-200">
               <span className="text-sm font-bold text-red-500">Previous Dues</span>
-              <span className="text-sm font-bold text-red-600">₨ {invoice.previousDues.toLocaleString()}</span>
+              <span className="text-sm font-bold text-red-600">PKR {invoice.previousDues.toLocaleString()}</span>
             </div>
           )}
 
           <div className="flex justify-between py-4 bg-blue-50 px-4 rounded-lg mt-4 border border-blue-100">
             <span className="text-base font-black text-blue-900">Total Due</span>
-            <span className="text-xl font-black text-blue-700">₨ {(invoice.totalAmount || invoice.amount || 0).toLocaleString()}</span>
+            <span className="text-xl font-black text-blue-700">PKR {(invoice.totalAmount || invoice.amount || 0).toLocaleString()}</span>
           </div>
         </div>
       </div>

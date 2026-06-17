@@ -212,7 +212,7 @@ export function SupplierDispatchBoard({ riders, onAssignRider }) {
                   </p>
                 </td>
                 <td className="px-6 py-4">
-                  <p className="font-black text-gray-800 text-base">₨ {o.totalAmount || (o.quantity * 150)}</p>
+                  <p className="font-black text-gray-800 text-base">PKR {o.totalAmount || (o.quantity * 150)}</p>
                   <p className="text-[10px] uppercase font-bold text-gray-400 border border-gray-200 inline-block px-1.5 rounded mt-1">{o.paymentMethod}</p>
                 </td>
                 <td className="px-6 py-4">

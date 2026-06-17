@@ -39,7 +39,7 @@ export function RiderCashManagement({ riders = [], onCashReceived }) {
           <Banknote className="w-32 h-32" />
         </div>
         <h2 className="text-sm font-bold uppercase tracking-widest text-indigo-100 mb-2 relative z-10">{t('total_cash_pending_collection')}</h2>
-        <p className="text-5xl font-black relative z-10">₨ {totalCashHeldByRiders.toLocaleString()}</p>
+        <p className="text-5xl font-black relative z-10">PKR {totalCashHeldByRiders.toLocaleString()}</p>
         <p className="text-sm text-indigo-100 font-medium mt-3 relative z-10">
           {t('currently_held_by_riders', { count: ridersWithCash.length })}
         </p>
@@ -81,19 +81,19 @@ export function RiderCashManagement({ riders = [], onCashReceived }) {
                       </div>
                     </td>
                     <td className="px-8 py-5">
-                      <p className="text-sm font-bold text-gray-600">₨ {(rider.totalCashRemitted || 0).toLocaleString()}</p>
+                      <p className="text-sm font-bold text-gray-600">PKR {(rider.totalCashRemitted || 0).toLocaleString()}</p>
                     </td>
                     <td className="px-8 py-5">
                       <div className="flex items-center gap-2">
                         {rider.cashInHand > 0 ? (
                           <>
                             <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-                            <p className="font-black text-xl text-red-600">₨ {rider.cashInHand.toLocaleString()}</p>
+                            <p className="font-black text-xl text-red-600">PKR {rider.cashInHand.toLocaleString()}</p>
                           </>
                         ) : (
                           <>
                             <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                            <p className="font-bold text-gray-400">₨ 0</p>
+                            <p className="font-bold text-gray-400">PKR 0</p>
                           </>
                         )}
                       </div>

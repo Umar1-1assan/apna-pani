@@ -149,7 +149,7 @@ export function BillingOverview({ loadInvoices }) {
                   </td>
                   <td className="px-6 py-4">
                     <p className={`font-black text-lg ${data.unbilledAmount > 0 ? 'text-emerald-600' : 'text-gray-400'}`}>
-                      ₨ {data.unbilledAmount.toLocaleString()}
+                      PKR {data.unbilledAmount.toLocaleString()}
                     </p>
                   </td>
                   <td className="px-6 py-4 text-right">

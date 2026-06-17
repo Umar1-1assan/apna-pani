@@ -162,11 +162,11 @@ export function UpdateCustomerModal({ customer, onClose, onUpdate, onDelete, rid
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-gray-600">Price per Bottle (₨)</label>
+                  <label className="text-xs font-semibold text-gray-600">Price per Bottle (PKR )</label>
                   <input name="bottlePrice" value={form.bottlePrice} onChange={handleChange} required min="1" type="number" className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-gray-600">Delivery Charges (₨)</label>
+                  <label className="text-xs font-semibold text-gray-600">Delivery Charges (PKR )</label>
                   <input name="deliveryCharges" value={form.deliveryCharges} onChange={handleChange} required min="0" type="number" className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all text-sm" />
                 </div>
                 <div className="flex flex-col gap-1.5">
